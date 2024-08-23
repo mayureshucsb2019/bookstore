@@ -9,7 +9,7 @@ ENV MYSQL_PASSWORD=${MYSQL_ADMIN_PASSWORD}
 
 # Copy the initialization scripts into the container
 COPY schema/create-schemas.sql /docker-entrypoint-initdb.d/
-COPY schema/book.sql /docker-entrypoint-initdb.d/
+COPY schema/books.sql /docker-entrypoint-initdb.d/
 
 # Expose MySQL port
 EXPOSE 3306

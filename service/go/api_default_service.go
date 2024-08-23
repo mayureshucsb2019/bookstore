@@ -12,81 +12,112 @@ package openapi
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"errors"
+	"database/sql"
+
+	"github.com/mayureshucsb2019/bookstore/go/db"
+
 )
 
-// DefaultAPIService is a service that implements the logic for the DefaultAPIServicer
-// This service should implement the business logic for every endpoint for the DefaultAPI API.
-// Include any external packages or services that will be required by this service.
+// DefaultAPIService is a service that implements the logic for the DefaultAPI API.
+// This service interacts with the repository layer for data access.
 type DefaultAPIService struct {
+	Repo *db.BookRepository  // Add a field to hold the repository
 }
 
-// NewDefaultAPIService creates a default api service
-func NewDefaultAPIService() *DefaultAPIService {
-	return &DefaultAPIService{}
+// NewDefaultAPIService creates a default API service with the given repository.
+func NewDefaultAPIService(repo *db.BookRepository) *DefaultAPIService {
+	return &DefaultAPIService{
+		Repo: repo,
+	}
 }
 
 // BooksGet - Get a list of all books
 func (s *DefaultAPIService) BooksGet(ctx context.Context) (ImplResponse, error) {
-	// TODO - update BooksGet with the required logic for this service method.
-	// Add api_default_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
-
-	// TODO: Uncomment the next line to return response Response(200, []Book{}) or use other options such as http.Ok ...
+	// TODO: Uncomment the next line to return response Response(404, {}) or use other options such as http.Ok ...
+	// return Response(404, nil),nil
+	books, err := s.Repo.GetAllBooks()  // Use the repository to get the books
+	if err != nil {
+		return Response(http.StatusInternalServerError, nil), err
+	}
 	// return Response(200, []Book{}), nil
 
-	return Response(http.StatusNotImplemented, nil), errors.New("BooksGet method not implemented")
+	return Response(http.StatusOK, books), errors.New("BooksGet method not implemented")
 }
 
 // BooksIsbnDelete - Delete a book by ISBN
 func (s *DefaultAPIService) BooksIsbnDelete(ctx context.Context, isbn string) (ImplResponse, error) {
-	// TODO - update BooksIsbnDelete with the required logic for this service method.
-	// Add api_default_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
-
-	// TODO: Uncomment the next line to return response Response(204, {}) or use other options such as http.Ok ...
-	// return Response(204, nil),nil
-
 	// TODO: Uncomment the next line to return response Response(404, {}) or use other options such as http.Ok ...
 	// return Response(404, nil),nil
+	err := s.Repo.DeleteBook(isbn)  // Use the repository to get the books
+	if err != nil {
+		return Response(http.StatusInternalServerError, nil), err
+	}
 
-	return Response(http.StatusNotImplemented, nil), errors.New("BooksIsbnDelete method not implemented")
+	return Response(http.StatusOK, nil), nil
 }
 
 // BooksIsbnGet - Get a specific book by ISBN
 func (s *DefaultAPIService) BooksIsbnGet(ctx context.Context, isbn string) (ImplResponse, error) {
-	// TODO - update BooksIsbnGet with the required logic for this service method.
-	// Add api_default_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
-
-	// TODO: Uncomment the next line to return response Response(200, Book{}) or use other options such as http.Ok ...
-	// return Response(200, Book{}), nil
-
 	// TODO: Uncomment the next line to return response Response(404, {}) or use other options such as http.Ok ...
 	// return Response(404, nil),nil
-
-	return Response(http.StatusNotImplemented, nil), errors.New("BooksIsbnGet method not implemented")
+	book, err := s.Repo.GetBookByISBN(isbn)  // Use the repository to get the books
+	if err != nil {
+		return Response(http.StatusInternalServerError, nil), err
+	}
+	
+	return Response(http.StatusOK, book), nil
 }
 
 // BooksIsbnPatch - Update a book by ISBN
 func (s *DefaultAPIService) BooksIsbnPatch(ctx context.Context, isbn string, book Book) (ImplResponse, error) {
-	// TODO - update BooksIsbnPatch with the required logic for this service method.
-	// Add api_default_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
-
-	// TODO: Uncomment the next line to return response Response(200, {}) or use other options such as http.Ok ...
-	// return Response(200, nil),nil
-
 	// TODO: Uncomment the next line to return response Response(404, {}) or use other options such as http.Ok ...
 	// return Response(404, nil),nil
+	// Check if the provided ISBN in the request path matches the ISBN in the body
+	if book.Isbn != isbn {
+		return Response(http.StatusBadRequest, nil), errors.New("ISBN in the path does not match ISBN in the body")
+	}
 
-	return Response(http.StatusNotImplemented, nil), errors.New("BooksIsbnPatch method not implemented")
+	// Call the repository method to update the book
+	dbBook := convertToDBBook(book)
+	err := s.Repo.UpdateBook(&dbBook)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return Response(http.StatusNotFound, nil), errors.New("book not found")
+		}
+		return Response(http.StatusInternalServerError, nil), err
+	}
+
+	return Response(http.StatusOK, nil), nil
 }
 
 // BooksPost - Add a new book
 func (s *DefaultAPIService) BooksPost(ctx context.Context, book Book) (ImplResponse, error) {
-	// TODO - update BooksPost with the required logic for this service method.
-	// Add api_default_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
+	// TODO: Uncomment the next line to return response Response(404, {}) or use other options such as http.Ok ...
+	// return Response(404, nil),nil
+	dbBook := convertToDBBook(book)
 
-	// TODO: Uncomment the next line to return response Response(201, {}) or use other options such as http.Ok ...
-	// return Response(201, nil),nil
+    err := s.Repo.CreateBook(&dbBook)
+    if err != nil {
+        return Response(http.StatusInternalServerError, nil), fmt.Errorf("failed to add book: %w", err)
+    }
 
-	return Response(http.StatusNotImplemented, nil), errors.New("BooksPost method not implemented")
+	return Response(http.StatusCreated, nil), nil
+}
+
+// Convert Book to db.Book
+func convertToDBBook(book Book) db.Book {
+	dbBook := db.Book{
+		ISBN:            book.Isbn,
+		Name:            book.Name,
+		Tags:            book.Tags,
+		AuthorName:      book.AuthorName,
+		DateOfPublish:   book.DateOfPublish,
+		PublishingHouse: book.PublishingHouse,
+		NumberOfPages:   int(book.NumberOfPages), // Convert int32 to int
+		Cost:            float64(book.Cost),       // Convert float32 to float64
+	}
+	return dbBook
 }
