@@ -16,6 +16,7 @@ import (
 	"io"
 	"encoding/json"
 	"os"
+	"database/sql"
 
 	openapi "github.com/mayureshucsb2019/bookstore/go"
 	"github.com/mayureshucsb2019/bookstore/go/db"
@@ -73,6 +74,12 @@ func main() {
     }
     defer dbConn.Close()
 
+	// Test the connection
+	if err := TestDBConnection(dbConn); err != nil {
+		log.Fatalf("Failed to connect to the database: %v", err)
+	}
+	log.Printf("Database connection is successful")
+
 	// Create the repository with the DB connection
 	bookRepo := db.NewBookRepository(dbConn)
 
@@ -84,4 +91,12 @@ func main() {
 	router := openapi.NewRouter(DefaultAPIController)
 
 	log.Fatal(http.ListenAndServe(":8080", router))
+}
+
+// TestDBConnection tests the database connection
+func TestDBConnection(db *sql.DB) error {
+    if err := db.Ping(); err != nil {
+        return err
+    }
+    return nil
 }

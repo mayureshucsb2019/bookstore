@@ -56,7 +56,7 @@ func InitDB(config DBConfig) (*sql.DB, error) {
 
 // CreateBook inserts a new book into the database.
 func (r *BookRepository) CreateBook(book *Book) error {
-	query := `INSERT INTO books (isbn, name, tags, author_name, date_of_publish, publishing_house, number_of_pages, cost) 
+	query := `INSERT INTO Books (isbn, name, tags, author_name, date_of_publish, publishing_house, number_of_pages, cost) 
               VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
 	_, err := r.DB.Exec(query, book.ISBN, book.Name, fmt.Sprintf("%v", book.Tags), book.AuthorName, book.DateOfPublish, book.PublishingHouse, book.NumberOfPages, book.Cost)
 	return err
@@ -64,7 +64,7 @@ func (r *BookRepository) CreateBook(book *Book) error {
 
 // GetBookByISBN retrieves a book from the database by its ISBN.
 func (r *BookRepository) GetBookByISBN(isbn string) (*Book, error) {
-	query := `SELECT isbn, name, tags, author_name, date_of_publish, publishing_house, number_of_pages, cost FROM books WHERE isbn = ?`
+	query := `SELECT isbn, name, tags, author_name, date_of_publish, publishing_house, number_of_pages, cost FROM Books WHERE isbn = ?`
 	row := r.DB.QueryRow(query, isbn)
 
 	var book Book
@@ -86,21 +86,21 @@ func (r *BookRepository) GetBookByISBN(isbn string) (*Book, error) {
 
 // UpdateBook updates an existing book record in the database.
 func (r *BookRepository) UpdateBook(book *Book) error {
-	query := `UPDATE books SET name=?, tags=?, author_name=?, date_of_publish=?, publishing_house=?, number_of_pages=?, cost=? WHERE isbn=?`
+	query := `UPDATE Books SET name=?, tags=?, author_name=?, date_of_publish=?, publishing_house=?, number_of_pages=?, cost=? WHERE isbn=?`
 	_, err := r.DB.Exec(query, book.Name, fmt.Sprintf("%v", book.Tags), book.AuthorName, book.DateOfPublish, book.PublishingHouse, book.NumberOfPages, book.Cost, book.ISBN)
 	return err
 }
 
 // DeleteBook removes a book from the database by its ISBN.
 func (r *BookRepository) DeleteBook(isbn string) error {
-	query := `DELETE FROM books WHERE isbn = ?`
+	query := `DELETE FROM Books WHERE isbn = ?`
 	_, err := r.DB.Exec(query, isbn)
 	return err
 }
 
 // GetAllBooks retrieves all books from the database.
 func (r *BookRepository) GetAllBooks() ([]Book, error) {
-	rows, err := r.DB.Query("SELECT * FROM books")
+	rows, err := r.DB.Query("SELECT * FROM Books")
 	if err != nil {
 		return nil, fmt.Errorf("failed to query books: %w", err)
 	}

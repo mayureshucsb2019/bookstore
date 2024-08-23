@@ -44,7 +44,7 @@ func (s *DefaultAPIService) BooksGet(ctx context.Context) (ImplResponse, error) 
 	}
 	// return Response(200, []Book{}), nil
 
-	return Response(http.StatusOK, books), errors.New("BooksGet method not implemented")
+	return Response(http.StatusOK, books), nil
 }
 
 // BooksIsbnDelete - Delete a book by ISBN
