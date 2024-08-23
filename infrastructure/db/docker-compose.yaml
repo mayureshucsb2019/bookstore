@@ -1,0 +1,19 @@
+services:
+  mysql:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_PASSWORD: ${MYSQL_ADMIN_PASSWORD}
+      MYSQL_DATABASE: bookstore
+      MYSQL_USER: bstore
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./schema/create-schemas.sql:/docker-entrypoint-initdb.d/create-schemas.sql
+      - ./schema/book.sql:/docker-entrypoint-initdb.d/book.sql
+
+volumes:
+  mysql_data:
