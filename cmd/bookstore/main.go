@@ -14,6 +14,8 @@ import (
 	book_db "github.com/mayureshucsb2019/bookstore/service/book/db"
 	book_service "github.com/mayureshucsb2019/bookstore/service/book/service"
 	"github.com/mayureshucsb2019/bookstore/service/common"
+	customer_db "github.com/mayureshucsb2019/bookstore/service/customer/db"
+	customer_service "github.com/mayureshucsb2019/bookstore/service/customer/service"
 )
 
 type Config struct {
@@ -85,8 +87,13 @@ func main() {
 	authorAPIService := author_service.NewDefaultAPIService(authorRepo)
 	authorAPIController := author_service.NewDefaultAPIController(authorAPIService)
 
+	// Create the author repository with the DB connection
+	customerRepo := customer_db.NewCustomerRepository(dbConn)
+	customerAPIService := customer_service.NewDefaultAPIService(customerRepo)
+	customerAPIController := customer_service.NewDefaultAPIController(customerAPIService)
+
 	log.Printf("Server started")
-	router := common.NewRouter(bookAPIController, authorAPIController)
+	router := common.NewRouter(bookAPIController, authorAPIController, customerAPIController)
 
 	log.Fatal(http.ListenAndServe(":8080", router))
 }

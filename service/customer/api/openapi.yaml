@@ -1,0 +1,231 @@
+openapi: 3.0.0
+info:
+  description: API for managing customers in an online bookstore.
+  title: Bookstore API - Customers
+  version: 1.0.0
+servers:
+- url: /
+paths:
+  /customers:
+    get:
+      parameters:
+      - description: The page number to retrieve. Defaults to 1 if not specified.
+        explode: true
+        in: query
+        name: pageNumber
+        required: false
+        schema:
+          default: 1
+          type: integer
+        style: form
+      - description: The number of items per page. Defaults to 25 if not specified.
+        explode: true
+        in: query
+        name: pageSize
+        required: false
+        schema:
+          default: 25
+          type: integer
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/_customers_get_200_response'
+          description: A JSON array of customers
+      summary: Get a paginated list of customers
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Customer'
+        required: true
+      responses:
+        "201":
+          description: Customer created successfully
+      summary: Add a new customer
+  /customers/{email}:
+    delete:
+      parameters:
+      - explode: false
+        in: path
+        name: email
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "204":
+          description: Customer deleted successfully
+        "404":
+          description: Customer not found
+      summary: Delete a customer by email
+    get:
+      parameters:
+      - explode: false
+        in: path
+        name: email
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customer'
+          description: A single customer
+        "404":
+          description: Customer not found
+      summary: Get a specific customer by email
+    patch:
+      parameters:
+      - explode: false
+        in: path
+        name: email
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Customer'
+        required: true
+      responses:
+        "200":
+          description: Customer updated successfully
+        "404":
+          description: Customer not found
+      summary: Update a customer by email
+components:
+  schemas:
+    Customer:
+      example:
+        country: country
+        notes: notes
+        city: city
+        last_login: 2000-01-23T04:56:07.000+00:00
+        last_name: last_name
+        middle_name: middle_name
+        street_name: street_name
+        zipcode: zipcode
+        registration_date: 2000-01-23T04:56:07.000+00:00
+        dob: 2000-01-23
+        unit_no: unit_no
+        phone_number: phone_number
+        state: state
+        landmark: landmark
+        first_name: first_name
+        email: email
+        status: Active
+      properties:
+        email:
+          type: string
+        first_name:
+          type: string
+        middle_name:
+          type: string
+        last_name:
+          type: string
+        phone_number:
+          type: string
+        dob:
+          format: date
+          type: string
+        unit_no:
+          type: string
+        street_name:
+          type: string
+        city:
+          type: string
+        state:
+          type: string
+        country:
+          type: string
+        zipcode:
+          type: string
+        landmark:
+          type: string
+        registration_date:
+          format: date-time
+          type: string
+        last_login:
+          format: date-time
+          type: string
+        status:
+          enum:
+          - Active
+          - Inactive
+          type: string
+        notes:
+          type: string
+      required:
+      - dob
+      - email
+      - first_name
+      - last_name
+      type: object
+    _customers_get_200_response:
+      example:
+        totalItems: 0
+        totalPages: 6
+        pageSize: 5
+        customers:
+        - country: country
+          notes: notes
+          city: city
+          last_login: 2000-01-23T04:56:07.000+00:00
+          last_name: last_name
+          middle_name: middle_name
+          street_name: street_name
+          zipcode: zipcode
+          registration_date: 2000-01-23T04:56:07.000+00:00
+          dob: 2000-01-23
+          unit_no: unit_no
+          phone_number: phone_number
+          state: state
+          landmark: landmark
+          first_name: first_name
+          email: email
+          status: Active
+        - country: country
+          notes: notes
+          city: city
+          last_login: 2000-01-23T04:56:07.000+00:00
+          last_name: last_name
+          middle_name: middle_name
+          street_name: street_name
+          zipcode: zipcode
+          registration_date: 2000-01-23T04:56:07.000+00:00
+          dob: 2000-01-23
+          unit_no: unit_no
+          phone_number: phone_number
+          state: state
+          landmark: landmark
+          first_name: first_name
+          email: email
+          status: Active
+        currentPage: 1
+      properties:
+        totalItems:
+          description: Total number of customers available.
+          type: integer
+        totalPages:
+          description: Total number of pages.
+          type: integer
+        currentPage:
+          description: The current page number.
+          type: integer
+        pageSize:
+          description: The number of items per page.
+          type: integer
+        customers:
+          items:
+            $ref: '#/components/schemas/Customer'
+          type: array
+      type: object
