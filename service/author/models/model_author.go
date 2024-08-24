@@ -1,13 +1,15 @@
 package models
 
-import "github.com/mayureshucsb2019/bookstore/service/common"
+import (
+	"github.com/mayureshucsb2019/bookstore/service/common"
+)
 
 type Author struct {
 	Id string `json:"id"`
 
 	Name AuthorName `json:"name"`
 
-	Dob string `json:"dob"`
+	DOB string `json:"dob"`
 
 	Address AuthorAddress `json:"address"`
 
@@ -19,7 +21,7 @@ func AssertAuthorRequired(obj Author) error {
 	elements := map[string]interface{}{
 		"id":        obj.Id,
 		"name":      obj.Name,
-		"dob":       obj.Dob,
+		"dob":       obj.DOB,
 		"address":   obj.Address,
 		"languages": obj.Languages,
 	}

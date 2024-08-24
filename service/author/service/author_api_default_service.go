@@ -34,8 +34,12 @@ func (s *DefaultAPIService) AuthorsGet(ctx context.Context, pageNumber int32, pa
 	if err != nil {
 		return common.Response(http.StatusInternalServerError, nil), err
 	}
+	var authorResp []models.Author
+	for _, author := range authors {
+		authorResp = append(authorResp, convertDBToAPIResponse(author))
+	}
 
-	return common.Response(http.StatusOK, authors), nil
+	return common.Response(http.StatusOK, authorResp), nil
 }
 
 // AuthorsIdDelete - Delete an author by ID
@@ -54,12 +58,12 @@ func (s *DefaultAPIService) AuthorsIdDelete(ctx context.Context, id string) (com
 func (s *DefaultAPIService) AuthorsIdGet(ctx context.Context, id string) (common.ImplResponse, error) {
 	// TODO: Uncomment the next line to return response Response(404, {}) or use other options such as http.Ok ...
 	// return Response(404, nil),nil
-	book, err := s.Repo.GetAuthorByID(id) // Use the repository to get the books
+	author, err := s.Repo.GetAuthorByID(id) // Use the repository to get the books
 	if err != nil {
 		return common.Response(http.StatusInternalServerError, nil), err
 	}
 
-	return common.Response(http.StatusOK, book), nil
+	return common.Response(http.StatusOK, convertDBToAPIResponse(*author)), nil
 }
 
 // AuthorsIdPatch - Update an author by ID
@@ -72,7 +76,7 @@ func (s *DefaultAPIService) AuthorsIdPatch(ctx context.Context, id string, autho
 	}
 
 	// Call the repository method to update the book
-	dbAuthor := convertToDBAuthor(author)
+	dbAuthor := convertApiToDBAuthor(author)
 	err := s.Repo.UpdateAuthor(&dbAuthor)
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -88,25 +92,25 @@ func (s *DefaultAPIService) AuthorsIdPatch(ctx context.Context, id string, autho
 func (s *DefaultAPIService) AuthorsPost(ctx context.Context, author models.Author) (common.ImplResponse, error) {
 	// TODO: Uncomment the next line to return response Response(404, {}) or use other options such as http.Ok ...
 	// return Response(404, nil),nil
-	dbBook := convertToDBAuthor(author)
+	dbAuthor := convertApiToDBAuthor(author)
 
-	err := s.Repo.CreateAuthor(&dbBook)
+	err := s.Repo.CreateAuthor(&dbAuthor)
 	if err != nil {
-		return common.Response(http.StatusInternalServerError, nil), fmt.Errorf("failed to add book: %w", err)
+		return common.Response(http.StatusInternalServerError, nil), fmt.Errorf("failed to add author: %w", err)
 	}
 
 	return common.Response(http.StatusCreated, nil), nil
 }
 
 // ConvertToDBAuthor converts an API model Author to a database model Author.
-func convertToDBAuthor(author models.Author) db.Author {
+func convertApiToDBAuthor(author models.Author) db.Author {
 	return db.Author{
 		ID:         author.Id,
 		FirstName:  author.Name.FirstName,
 		MiddleName: nullStringOrNil(author.Name.MiddleName),
 		LastName:   author.Name.LastName,
-		DOB:        author.Dob,
-		Unit:       nullStringOrNil(author.Address.Unit),
+		DOB:        nullStringOrNil(author.DOB),
+		UnitNo:     nullStringOrNil(author.Address.Unit),
 		StreetName: nullStringOrNil(author.Address.StreetName),
 		City:       nullStringOrNil(author.Address.City),
 		State:      nullStringOrNil(author.Address.State),
@@ -123,4 +127,35 @@ func nullStringOrNil(value string) sql.NullString {
 		return sql.NullString{Valid: false}
 	}
 	return sql.NullString{String: value, Valid: true}
+}
+
+// ConvertDBToAPIResponse converts the DB model to the API model
+func convertDBToAPIResponse(db db.Author) models.Author {
+	return models.Author{
+		Id: db.ID,
+		Name: models.AuthorName{
+			FirstName:  db.FirstName,
+			MiddleName: stringOrEmpty(db.MiddleName),
+			LastName:   db.LastName,
+		},
+		DOB: stringOrEmpty(db.DOB),
+		Address: models.AuthorAddress{
+			Unit:       stringOrEmpty(db.UnitNo),
+			StreetName: stringOrEmpty(db.StreetName),
+			City:       stringOrEmpty(db.City),
+			State:      stringOrEmpty(db.State),
+			Country:    stringOrEmpty(db.Country),
+			Zipcode:    stringOrEmpty(db.Zipcode),
+			Landmark:   stringOrEmpty(db.Landmark),
+		},
+		Languages: db.Languages,
+	}
+}
+
+// Helper function to convert sql.NullString to string
+func stringOrEmpty(ns sql.NullString) string {
+	if ns.Valid {
+		return ns.String
+	}
+	return ""
 }

@@ -10,19 +10,19 @@ import (
 
 // Author represents the structure of an Author record in the database.
 type Author struct {
-	ID         string         `json:"id" db:"id"`
-	FirstName  string         `json:"first_name" db:"first_name"`
-	MiddleName sql.NullString `json:"middle_name" db:"middle_name"`
-	LastName   string         `json:"last_name" db:"last_name"`
-	DOB        string         `json:"dob" db:"dob"`
-	Unit       sql.NullString `json:"unit" db:"unit_no"`
-	StreetName sql.NullString `json:"street_name" db:"street_name"`
-	City       sql.NullString `json:"city" db:"city"`
-	State      sql.NullString `json:"state" db:"state"`
-	Country    sql.NullString `json:"country" db:"country"`
-	Zipcode    sql.NullString `json:"zipcode" db:"zipcode"`
-	Landmark   sql.NullString `json:"landmark" db:"landmark"`
-	Languages  []string       `json:"languages" db:"-"`
+	ID         string         `json:"id"`
+	FirstName  string         `json:"first_name"`
+	MiddleName sql.NullString `json:"middle_name"`
+	LastName   string         `json:"last_name"`
+	DOB        sql.NullString `json:"dob"`
+	UnitNo     sql.NullString `json:"unit_no"`
+	StreetName sql.NullString `json:"street_name"`
+	City       sql.NullString `json:"city"`
+	State      sql.NullString `json:"state"`
+	Country    sql.NullString `json:"country"`
+	Zipcode    sql.NullString `json:"zipcode"`
+	Landmark   sql.NullString `json:"landmark"`
+	Languages  []string       `json:"languages"`
 }
 
 // Scan method to handle the JSON decoding for the Languages field
@@ -72,7 +72,7 @@ func (r *AuthorRepository) CreateAuthor(author *Author) error {
 		author.MiddleName,
 		author.LastName,
 		author.DOB,
-		author.Unit,
+		author.UnitNo,
 		author.StreetName,
 		author.City,
 		author.State,
@@ -105,7 +105,7 @@ func (r *AuthorRepository) GetAuthorByID(id string) (*Author, error) {
 		&author.MiddleName,
 		&author.LastName,
 		&author.DOB,
-		&author.Unit,
+		&author.UnitNo,
 		&author.StreetName,
 		&author.City,
 		&author.State,
@@ -169,7 +169,7 @@ func (r *AuthorRepository) UpdateAuthor(author *Author) error {
 		author.MiddleName,
 		author.LastName,
 		author.DOB,
-		author.Unit,
+		author.UnitNo,
 		author.StreetName,
 		author.City,
 		author.State,
@@ -248,7 +248,7 @@ func (r *AuthorRepository) GetAllAuthors() ([]Author, error) {
 			&author.MiddleName,
 			&author.LastName,
 			&author.DOB,
-			&author.Unit,
+			&author.UnitNo,
 			&author.StreetName,
 			&author.City,
 			&author.State,
