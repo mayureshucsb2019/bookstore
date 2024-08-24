@@ -2,7 +2,9 @@ package service
 
 import (
 	"context"
+	"database/sql"
 	"errors"
+	"fmt"
 	"net/http"
 
 	"github.com/mayureshucsb2019/bookstore/service/author/db"
@@ -26,64 +28,99 @@ func NewDefaultAPIService(repo *db.AuthorRepository) *DefaultAPIService {
 
 // AuthorsGet - Get a list of authors
 func (s *DefaultAPIService) AuthorsGet(ctx context.Context, pageNumber int32, pageSize int32) (common.ImplResponse, error) {
-	// TODO - update AuthorsGet with the required logic for this service method.
-	// Add api_default_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
+	// TODO: Uncomment the next line to return response Response(404, {}) or use other options such as http.Ok ...
+	// return Response(404, nil),nil
+	authors, err := s.Repo.GetAllAuthors() // Use the repository to get the books
+	if err != nil {
+		return common.Response(http.StatusInternalServerError, nil), err
+	}
 
-	// TODO: Uncomment the next line to return response Response(200, AuthorsGet200Response{}) or use other options such as http.Ok ...
-	// return Response(200, AuthorsGet200Response{}), nil
-
-	return common.Response(http.StatusNotImplemented, nil), errors.New("AuthorsGet method not implemented")
+	return common.Response(http.StatusOK, authors), nil
 }
 
 // AuthorsIdDelete - Delete an author by ID
 func (s *DefaultAPIService) AuthorsIdDelete(ctx context.Context, id string) (common.ImplResponse, error) {
-	// TODO - update AuthorsIdDelete with the required logic for this service method.
-	// Add api_default_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
-
-	// TODO: Uncomment the next line to return response Response(204, {}) or use other options such as http.Ok ...
-	// return Response(204, nil),nil
-
 	// TODO: Uncomment the next line to return response Response(404, {}) or use other options such as http.Ok ...
 	// return Response(404, nil),nil
+	err := s.Repo.DeleteAuthor(id) // Use the repository to get the books
+	if err != nil {
+		return common.Response(http.StatusInternalServerError, nil), err
+	}
 
-	return common.Response(http.StatusNotImplemented, nil), errors.New("AuthorsIdDelete method not implemented")
+	return common.Response(http.StatusOK, nil), nil
 }
 
 // AuthorsIdGet - Get a specific author by ID
 func (s *DefaultAPIService) AuthorsIdGet(ctx context.Context, id string) (common.ImplResponse, error) {
-	// TODO - update AuthorsIdGet with the required logic for this service method.
-	// Add api_default_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
-
-	// TODO: Uncomment the next line to return response Response(200, Author{}) or use other options such as http.Ok ...
-	// return Response(200, Author{}), nil
-
 	// TODO: Uncomment the next line to return response Response(404, {}) or use other options such as http.Ok ...
 	// return Response(404, nil),nil
+	book, err := s.Repo.GetAuthorByID(id) // Use the repository to get the books
+	if err != nil {
+		return common.Response(http.StatusInternalServerError, nil), err
+	}
 
-	return common.Response(http.StatusNotImplemented, nil), errors.New("AuthorsIdGet method not implemented")
+	return common.Response(http.StatusOK, book), nil
 }
 
 // AuthorsIdPatch - Update an author by ID
 func (s *DefaultAPIService) AuthorsIdPatch(ctx context.Context, id string, author models.Author) (common.ImplResponse, error) {
-	// TODO - update AuthorsIdPatch with the required logic for this service method.
-	// Add api_default_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
-
-	// TODO: Uncomment the next line to return response Response(200, {}) or use other options such as http.Ok ...
-	// return Response(200, nil),nil
-
 	// TODO: Uncomment the next line to return response Response(404, {}) or use other options such as http.Ok ...
 	// return Response(404, nil),nil
+	// Check if the provided ISBN in the request path matches the ISBN in the body
+	if author.Id != id {
+		return common.Response(http.StatusBadRequest, nil), errors.New("Id in the path does not match Id in the body")
+	}
 
-	return common.Response(http.StatusNotImplemented, nil), errors.New("AuthorsIdPatch method not implemented")
+	// Call the repository method to update the book
+	dbAuthor := convertToDBAuthor(author)
+	err := s.Repo.UpdateAuthor(&dbAuthor)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return common.Response(http.StatusNotFound, nil), errors.New("book not found")
+		}
+		return common.Response(http.StatusInternalServerError, nil), err
+	}
+
+	return common.Response(http.StatusOK, nil), nil
 }
 
 // AuthorsPost - Add a new author
 func (s *DefaultAPIService) AuthorsPost(ctx context.Context, author models.Author) (common.ImplResponse, error) {
-	// TODO - update AuthorsPost with the required logic for this service method.
-	// Add api_default_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
+	// TODO: Uncomment the next line to return response Response(404, {}) or use other options such as http.Ok ...
+	// return Response(404, nil),nil
+	dbBook := convertToDBAuthor(author)
 
-	// TODO: Uncomment the next line to return response Response(201, {}) or use other options such as http.Ok ...
-	// return Response(201, nil),nil
+	err := s.Repo.CreateAuthor(&dbBook)
+	if err != nil {
+		return common.Response(http.StatusInternalServerError, nil), fmt.Errorf("failed to add book: %w", err)
+	}
 
-	return common.Response(http.StatusNotImplemented, nil), errors.New("AuthorsPost method not implemented")
+	return common.Response(http.StatusCreated, nil), nil
+}
+
+// ConvertToDBAuthor converts an API model Author to a database model Author.
+func convertToDBAuthor(author models.Author) db.Author {
+	return db.Author{
+		ID:         author.Id,
+		FirstName:  author.Name.FirstName,
+		MiddleName: nullStringOrNil(author.Name.MiddleName),
+		LastName:   author.Name.LastName,
+		DOB:        author.Dob,
+		Unit:       nullStringOrNil(author.Address.Unit),
+		StreetName: nullStringOrNil(author.Address.StreetName),
+		City:       nullStringOrNil(author.Address.City),
+		State:      nullStringOrNil(author.Address.State),
+		Country:    nullStringOrNil(author.Address.Country),
+		Zipcode:    nullStringOrNil(author.Address.Zipcode),
+		Landmark:   nullStringOrNil(author.Address.Landmark),
+		Languages:  author.Languages,
+	}
+}
+
+// Convert a string to sql.NullString. Returns a NullString with valid value or null.
+func nullStringOrNil(value string) sql.NullString {
+	if value == "" {
+		return sql.NullString{Valid: false}
+	}
+	return sql.NullString{String: value, Valid: true}
 }
