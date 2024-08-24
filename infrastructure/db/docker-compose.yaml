@@ -12,8 +12,12 @@ services:
       - "3306:3306"
     volumes:
       - mysql_data:/var/lib/mysql
-      - ./schema/create-schemas.sql:/docker-entrypoint-initdb.d/create-schemas.sql
-      - ./schema/books.sql:/docker-entrypoint-initdb.d/books.sql
+      - ./schema/1-create-schemas.sql:/docker-entrypoint-initdb.d/1-create-schemas.sql
+      - ./schema/2-authors.sql:/docker-entrypoint-initdb.d/2-authors.sql
+      - ./schema/3-books.sql:/docker-entrypoint-initdb.d/3-books.sql
+      - ./schema/4-customers.sql:/docker-entrypoint-initdb.d/4-customers.sql
+      - ./schema/5-orders.sql:/docker-entrypoint-initdb.d/5-orders.sql
+      - ./schema/6-order-items.sql:/docker-entrypoint-initdb.d/6-order-items.sql
 
 volumes:
   mysql_data:
