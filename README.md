@@ -10,9 +10,12 @@
 * go get github.com/gorilla/mux
 * go get github.com/go-sql-driver/mysql
 
-* Install MySQL brew install mysql
+# Install MySQL 
+* brew install mysql
 * docker build -t my-mysql-image .
 * docker run -d --name mysql-container -p 3306:3306 my-mysql-image
 * docker exec -it mysql-container mysql -u bstore -p
 
-* $ docker-compose -f infrastructure/db/docker-compose.yaml up --build
+# User Docker Compose to automatically build mysql docker image
+* cd to bookstore/service
+* $docker-compose -f infrastructure/db/docker-compose.yaml up --build
