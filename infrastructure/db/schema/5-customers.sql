@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS Customer (
     middle_name VARCHAR(255),
     last_name VARCHAR(255) NOT NULL,
     phone_number VARCHAR(20),
-    dob DATE NOT NULL,
+    dob VARCHAR(16) NOT NULL,
     unit_no VARCHAR(255),
     street_name VARCHAR(255),
     city VARCHAR(255),

@@ -3,25 +3,31 @@ package db
 import (
 	"database/sql"
 	"encoding/json"
+	"fmt"
 
 	_ "github.com/go-sql-driver/mysql"
 )
 
-// Customer struct represents the structure of a Customer record in the database.
+// Customer represents the structure of a Customer record in the database.
 type Customer struct {
-	ID         string         `json:"id" db:"id"`
-	FirstName  string         `json:"first_name" db:"first_name"`
-	MiddleName sql.NullString `json:"middle_name" db:"middle_name"` // Nullable string
-	LastName   string         `json:"last_name" db:"last_name"`
-	DOB        string         `json:"dob" db:"dob"`   // Date in string format
-	Unit       sql.NullString `json:"unit" db:"unit"` // Nullable string
-	StreetName sql.NullString `json:"street_name" db:"street_name"`
-	City       sql.NullString `json:"city" db:"city"`
-	State      sql.NullString `json:"state" db:"state"`
-	Country    sql.NullString `json:"country" db:"country"`
-	Zipcode    sql.NullString `json:"zipcode" db:"zipcode"`
-	Landmark   sql.NullString `json:"landmark" db:"landmark"`
-	Languages  []string       `json:"languages" db:"languages"` // JSON array of strings
+	Email            string         `json:"email" db:"email"`
+	FirstName        string         `json:"first_name" db:"first_name"`
+	MiddleName       sql.NullString `json:"middle_name" db:"middle_name"` // Nullable string
+	LastName         string         `json:"last_name" db:"last_name"`
+	PhoneNumber      sql.NullString `json:"phone_number" db:"phone_number"`
+	Dob              string         `json:"dob" db:"dob"`         // Date in string format
+	UnitNo           sql.NullString `json:"unit_no" db:"unit_no"` // Nullable string
+	StreetName       sql.NullString `json:"street_name" db:"street_name"`
+	City             sql.NullString `json:"city" db:"city"`
+	State            sql.NullString `json:"state" db:"state"`
+	Country          sql.NullString `json:"country" db:"country"`
+	Zipcode          sql.NullString `json:"zipcode" db:"zipcode"`
+	Landmark         sql.NullString `json:"landmark" db:"landmark"`
+	RegistrationDate string         `json:"registration_date" db:"registration_date"` // Timestamp as string
+	LastLogin        sql.NullString `json:"last_login" db:"last_login"`               // Timestamp as string
+	Status           string         `json:"status" db:"status"`                       // ENUM value
+	Notes            sql.NullString `json:"notes" db:"notes"`
+	Languages        []string       `json:"languages" db:"languages"` // JSON array of strings
 }
 
 // Scan method to handle the JSON decoding for the Languages field
@@ -47,26 +53,160 @@ func NewCustomerRepository(db *sql.DB) *CustomerRepository {
 }
 
 // CreateCustomer inserts a new Customer into the database.
-func (r *CustomerRepository) CreateCustomer(Customer *Customer) error {
+func (r *CustomerRepository) CreateCustomer(customer *Customer) error {
+	// Prepare the SQL insert statement
+	query := `
+		INSERT INTO Customer (
+			email, first_name, middle_name, last_name, phone_number, dob,
+			unit_no, street_name, city, state, country, zipcode, landmark,
+			registration_date, last_login, status, notes, languages
+		) VALUES (
+			?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+		)
+	`
+
+	// Execute the SQL statement
+	_, err := r.DB.Exec(query,
+		customer.Email,
+		customer.FirstName,
+		customer.MiddleName,
+		customer.LastName,
+		customer.PhoneNumber,
+		customer.Dob,
+		customer.UnitNo,
+		customer.StreetName,
+		customer.City,
+		customer.State,
+		customer.Country,
+		customer.Zipcode,
+		customer.Landmark,
+		customer.RegistrationDate,
+		customer.LastLogin,
+		customer.Status,
+		customer.Notes,
+		customer.Languages,
+	)
+	if err != nil {
+		return fmt.Errorf("failed to insert customer: %w", err)
+	}
+
 	return nil
 }
 
-// GetCustomerByISBN retrieves a Customer from the database by its ISBN.
-func (r *CustomerRepository) GetCustomerByID(id string) (*Customer, error) {
-	return &Customer{}, nil
+// GetCustomerByID retrieves a Customer from the database by its email.
+func (r *CustomerRepository) GetCustomerByID(email string) (*Customer, error) {
+	// Prepare the SQL select statement
+	query := `SELECT * FROM Customer WHERE email = ?`
+
+	// Execute the query
+	row := r.DB.QueryRow(query, email)
+
+	// Scan the result into a Customer struct
+	var customer Customer
+	err := row.Scan(
+		&customer.Email,
+		&customer.FirstName,
+		&customer.MiddleName,
+		&customer.LastName,
+		&customer.PhoneNumber,
+		&customer.Dob,
+		&customer.UnitNo,
+		&customer.StreetName,
+		&customer.City,
+		&customer.State,
+		&customer.Country,
+		&customer.Zipcode,
+		&customer.Landmark,
+		&customer.RegistrationDate,
+		&customer.LastLogin,
+		&customer.Status,
+		&customer.Notes,
+		&customer.Languages,
+	)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			// No customer found with the given email
+			return nil, nil
+		}
+		// Other errors
+		return nil, fmt.Errorf("failed to retrieve customer: %w", err)
+	}
+
+	return &customer, nil
 }
 
-// UpdateCustomer updates an existing Customer record in the database.
-func (r *CustomerRepository) UpdateCustomer(Customer *Customer) error {
-	return nil
-}
+// DeleteCustomer removes a Customer from the database by their email.
+func (r *CustomerRepository) DeleteCustomer(email string) error {
+	// Prepare the SQL delete statement
+	query := `DELETE FROM Customer WHERE email = ?`
 
-// DeleteCustomer removes a Customer from the database by its ISBN.
-func (r *CustomerRepository) DeleteCustomer(id string) error {
+	// Execute the SQL statement
+	result, err := r.DB.Exec(query, email)
+	if err != nil {
+		return fmt.Errorf("failed to delete customer: %w", err)
+	}
+
+	// Check if any rows were affected
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("failed to check rows affected: %w", err)
+	}
+	if rowsAffected == 0 {
+		// No customer found with the given email
+		return nil
+	}
+
 	return nil
 }
 
 // GetAllCustomers retrieves all Customers from the database.
 func (r *CustomerRepository) GetAllCustomers() ([]Customer, error) {
-	return []Customer{}, nil
+	// Prepare the SQL select statement
+	query := `SELECT * FROM Customer`
+
+	// Execute the query
+	rows, err := r.DB.Query(query)
+	if err != nil {
+		return nil, fmt.Errorf("failed to query customers: %w", err)
+	}
+	defer rows.Close()
+
+	// Slice to hold all customers
+	var customers []Customer
+
+	// Iterate over the rows
+	for rows.Next() {
+		var customer Customer
+		err := rows.Scan(
+			&customer.Email,
+			&customer.FirstName,
+			&customer.MiddleName,
+			&customer.LastName,
+			&customer.PhoneNumber,
+			&customer.Dob,
+			&customer.UnitNo,
+			&customer.StreetName,
+			&customer.City,
+			&customer.State,
+			&customer.Country,
+			&customer.Zipcode,
+			&customer.Landmark,
+			&customer.RegistrationDate,
+			&customer.LastLogin,
+			&customer.Status,
+			&customer.Notes,
+			&customer.Languages,
+		)
+		if err != nil {
+			return nil, fmt.Errorf("failed to scan customer: %w", err)
+		}
+		customers = append(customers, customer)
+	}
+
+	// Check for errors from iterating over rows
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("error occurred during rows iteration: %w", err)
+	}
+
+	return customers, nil
 }

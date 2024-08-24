@@ -9,29 +9,13 @@ import (
 type Customer struct {
 	Email string `json:"email"`
 
-	FirstName string `json:"first_name"`
-
-	MiddleName string `json:"middle_name,omitempty"`
-
-	LastName string `json:"last_name"`
+	Name CustomerName `json:"name"`
 
 	PhoneNumber string `json:"phone_number,omitempty"`
 
-	Dob string `json:"dob"`
+	DOB string `json:"dob"`
 
-	UnitNo string `json:"unit_no,omitempty"`
-
-	StreetName string `json:"street_name,omitempty"`
-
-	City string `json:"city,omitempty"`
-
-	State string `json:"state,omitempty"`
-
-	Country string `json:"country,omitempty"`
-
-	Zipcode string `json:"zipcode,omitempty"`
-
-	Landmark string `json:"landmark,omitempty"`
+	Address CustomerAddress `json:"address"`
 
 	RegistrationDate time.Time `json:"registration_date,omitempty"`
 
@@ -40,15 +24,18 @@ type Customer struct {
 	Status string `json:"status,omitempty"`
 
 	Notes string `json:"notes,omitempty"`
+
+	Languages []string `json:"languages"`
 }
 
 // AssertCustomerRequired checks if the required fields are not zero-ed
 func AssertCustomerRequired(obj Customer) error {
 	elements := map[string]interface{}{
 		"email":      obj.Email,
-		"first_name": obj.FirstName,
-		"last_name":  obj.LastName,
-		"dob":        obj.Dob,
+		"first_name": obj.Name.FirstName,
+		"last_name":  obj.Name.LastName,
+		"dob":        obj.DOB,
+		"languages":  obj.Languages,
 	}
 	for name, el := range elements {
 		if isZero := common.IsZeroValue(el); isZero {
