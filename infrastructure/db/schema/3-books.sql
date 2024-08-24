@@ -5,9 +5,9 @@ CREATE TABLE IF NOT EXISTS Books (
     isbn VARCHAR(255) PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     tags JSON,
-    author_name VARCHAR(255) NOT NULL,
+    author_names JSON,
     date_of_publish DATE NOT NULL,
-    publishing_house VARCHAR(255),
+    publishing_house JSON,
     number_of_pages INT,
     cost FLOAT
 );

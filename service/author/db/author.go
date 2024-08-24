@@ -15,14 +15,14 @@ type Author struct {
 	MiddleName sql.NullString `json:"middle_name" db:"middle_name"`
 	LastName   string         `json:"last_name" db:"last_name"`
 	DOB        string         `json:"dob" db:"dob"`
-	Unit       sql.NullString `json:"unit" db:"unit"`
+	Unit       sql.NullString `json:"unit" db:"unit_no"`
 	StreetName sql.NullString `json:"street_name" db:"street_name"`
 	City       sql.NullString `json:"city" db:"city"`
 	State      sql.NullString `json:"state" db:"state"`
 	Country    sql.NullString `json:"country" db:"country"`
 	Zipcode    sql.NullString `json:"zipcode" db:"zipcode"`
 	Landmark   sql.NullString `json:"landmark" db:"landmark"`
-	Languages  []string       `json:"languages" db:"-"` // Use []string for JSON unmarshalling
+	Languages  []string       `json:"languages" db:"-"`
 }
 
 // Scan method to handle the JSON decoding for the Languages field

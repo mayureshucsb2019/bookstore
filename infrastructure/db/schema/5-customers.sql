@@ -19,4 +19,5 @@ CREATE TABLE IF NOT EXISTS Customer (
     last_login TIMESTAMP,
     status ENUM('Active', 'Inactive') DEFAULT 'Active',
     notes TEXT
+    languages JSON
 );
