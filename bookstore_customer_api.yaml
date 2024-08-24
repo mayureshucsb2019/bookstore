@@ -1,0 +1,160 @@
+openapi: 3.0.0
+info:
+  title: Bookstore API - Customers
+  version: 1.0.0
+  description: API for managing customers in an online bookstore.
+
+paths:
+  /customers:
+    get:
+      summary: Get a paginated list of customers
+      parameters:
+        - in: query
+          name: pageNumber
+          schema:
+            type: integer
+            default: 1
+          description: The page number to retrieve. Defaults to 1 if not specified.
+        - in: query
+          name: pageSize
+          schema:
+            type: integer
+            default: 25
+          description: The number of items per page. Defaults to 25 if not specified.
+      responses:
+        '200':
+          description: A JSON array of customers
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  totalItems:
+                    type: integer
+                    description: Total number of customers available.
+                  totalPages:
+                    type: integer
+                    description: Total number of pages.
+                  currentPage:
+                    type: integer
+                    description: The current page number.
+                  pageSize:
+                    type: integer
+                    description: The number of items per page.
+                  customers:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Customer'
+    post:
+      summary: Add a new customer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Customer'
+      responses:
+        '201':
+          description: Customer created successfully
+
+  /customers/{email}:
+    get:
+      summary: Get a specific customer by email
+      parameters:
+        - name: email
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A single customer
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customer'
+        '404':
+          description: Customer not found
+
+    patch:
+      summary: Update a customer by email
+      parameters:
+        - name: email
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Customer'
+      responses:
+        '200':
+          description: Customer updated successfully
+        '404':
+          description: Customer not found
+
+    delete:
+      summary: Delete a customer by email
+      parameters:
+        - name: email
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Customer deleted successfully
+        '404':
+          description: Customer not found
+
+components:
+  schemas:
+    Customer:
+      type: object
+      properties:
+        email:
+          type: string
+        first_name:
+          type: string
+        middle_name:
+          type: string
+        last_name:
+          type: string
+        phone_number:
+          type: string
+        dob:
+          type: string
+          format: date
+        unit_no:
+          type: string
+        street_name:
+          type: string
+        city:
+          type: string
+        state:
+          type: string
+        country:
+          type: string
+        zipcode:
+          type: string
+        landmark:
+          type: string
+        registration_date:
+          type: string
+          format: date-time
+        last_login:
+          type: string
+          format: date-time
+        status:
+          type: string
+          enum: ['Active', 'Inactive']
+        notes:
+          type: string
+      required:
+        - email
+        - first_name
+        - last_name
+        - dob

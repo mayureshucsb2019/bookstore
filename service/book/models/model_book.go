@@ -1,6 +1,6 @@
 package models
 
-import "github.com/mayureshucsb2019/bookstore/service/go/common"
+import "github.com/mayureshucsb2019/bookstore/service/common"
 
 type Book struct {
 	Isbn string `json:"isbn"`

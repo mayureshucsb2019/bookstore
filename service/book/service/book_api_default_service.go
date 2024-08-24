@@ -8,9 +8,9 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/mayureshucsb2019/bookstore/service/go/book/db"
-	"github.com/mayureshucsb2019/bookstore/service/go/book/models"
-	"github.com/mayureshucsb2019/bookstore/service/go/common"
+	"github.com/mayureshucsb2019/bookstore/service/book/db"
+	"github.com/mayureshucsb2019/bookstore/service/book/models"
+	"github.com/mayureshucsb2019/bookstore/service/common"
 )
 
 // DefaultAPIService is a service that implements the logic for the DefaultAPI API.

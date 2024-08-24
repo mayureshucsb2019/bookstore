@@ -9,11 +9,11 @@ import (
 	"net/http"
 	"os"
 
-	author_db "github.com/mayureshucsb2019/bookstore/service/go/author/db"
-	author_service "github.com/mayureshucsb2019/bookstore/service/go/author/service"
-	book_db "github.com/mayureshucsb2019/bookstore/service/go/book/db"
-	book_service "github.com/mayureshucsb2019/bookstore/service/go/book/service"
-	"github.com/mayureshucsb2019/bookstore/service/go/common"
+	author_db "github.com/mayureshucsb2019/bookstore/service/author/db"
+	author_service "github.com/mayureshucsb2019/bookstore/service/author/service"
+	book_db "github.com/mayureshucsb2019/bookstore/service/book/db"
+	book_service "github.com/mayureshucsb2019/bookstore/service/book/service"
+	"github.com/mayureshucsb2019/bookstore/service/common"
 )
 
 type Config struct {
