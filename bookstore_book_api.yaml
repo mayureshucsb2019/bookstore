@@ -1,0 +1,142 @@
+openapi: 3.0.0
+info:
+  title: Bookstore API - Books
+  version: 1.0.0
+  description: API for managing books in an online bookstore.
+
+paths:
+  /books:
+    get:
+      summary: Get a paginated list of books
+      parameters:
+        - in: query
+          name: pageNumber
+          schema:
+            type: integer
+            default: 1
+          description: The page number to retrieve. Defaults to 1 if not specified.
+        - in: query
+          name: pageSize
+          schema:
+            type: integer
+            default: 25
+          description: The number of items per page. Defaults to 25 if not specified.
+      responses:
+        '200':
+          description: A JSON array of books
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  totalItems:
+                    type: integer
+                    description: Total number of books available.
+                  totalPages:
+                    type: integer
+                    description: Total number of pages.
+                  currentPage:
+                    type: integer
+                    description: The current page number.
+                  pageSize:
+                    type: integer
+                    description: The number of items per page.
+                  books:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Book'
+    post:
+      summary: Add a new book
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Book'
+      responses:
+        '201':
+          description: Book created successfully
+
+  /books/{isbn}:
+    get:
+      summary: Get a specific book by ISBN
+      parameters:
+        - name: isbn
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A single book
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Book'
+        '404':
+          description: Book not found
+
+    patch:
+      summary: Update a book by ISBN
+      parameters:
+        - name: isbn
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Book'
+      responses:
+        '200':
+          description: Book updated successfully
+        '404':
+          description: Book not found
+
+    delete:
+      summary: Delete a book by ISBN
+      parameters:
+        - name: isbn
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Book deleted successfully
+        '404':
+          description: Book not found
+
+components:
+  schemas:
+    Book:
+      type: object
+      properties:
+        isbn:
+          type: string
+        name:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        author_name:
+          type: string
+        date_of_publish:
+          type: string
+          format: date
+        publishing_house:
+          type: string
+        number_of_pages:
+          type: integer
+        cost:
+          type: number
+          format: float
+      required:
+        - isbn
+        - name
+        - author_name
+        - date_of_publish

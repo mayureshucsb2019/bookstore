@@ -1,13 +1,13 @@
 openapi: 3.0.0
 info:
-  title: Bookstore API
+  title: Bookstore API - Authors
   version: 1.0.0
-  description: API for managing books in an online bookstore.
+  description: API for managing authors in an online bookstore.
 
 paths:
-  /books:
+  /authors:
     get:
-      summary: Get a paginated list of books
+      summary: Get a list of authors
       parameters:
         - in: query
           name: pageNumber
@@ -23,7 +23,7 @@ paths:
           description: The number of items per page. Defaults to 25 if not specified.
       responses:
         '200':
-          description: A JSON array of books
+          description: A JSON array of authors
           content:
             application/json:
               schema:
@@ -31,7 +31,7 @@ paths:
                 properties:
                   totalItems:
                     type: integer
-                    description: Total number of books available.
+                    description: Total number of authors available.
                   totalPages:
                     type: integer
                     description: Total number of pages.
@@ -41,45 +41,45 @@ paths:
                   pageSize:
                     type: integer
                     description: The number of items per page.
-                  books:
+                  authors:
                     type: array
                     items:
-                      $ref: '#/components/schemas/Book'
+                      $ref: '#/components/schemas/Author'
     post:
-      summary: Add a new book
+      summary: Add a new author
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Book'
+              $ref: '#/components/schemas/Author'
       responses:
         '201':
-          description: Book created successfully
+          description: Author created successfully
 
-  /books/{isbn}:
+  /authors/{id}:
     get:
-      summary: Get a specific book by ISBN
+      summary: Get a specific author by ID
       parameters:
-        - name: isbn
+        - name: id
           in: path
           required: true
           schema:
             type: string
       responses:
         '200':
-          description: A single book
+          description: A single author
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Book'
+                $ref: '#/components/schemas/Author'
         '404':
-          description: Book not found
+          description: Author not found
 
     patch:
-      summary: Update a book by ISBN
+      summary: Update an author by ID
       parameters:
-        - name: isbn
+        - name: id
           in: path
           required: true
           schema:
@@ -89,54 +89,70 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Book'
+              $ref: '#/components/schemas/Author'
       responses:
         '200':
-          description: Book updated successfully
+          description: Author updated successfully
         '404':
-          description: Book not found
+          description: Author not found
 
     delete:
-      summary: Delete a book by ISBN
+      summary: Delete an author by ID
       parameters:
-        - name: isbn
+        - name: id
           in: path
           required: true
           schema:
             type: string
       responses:
         '204':
-          description: Book deleted successfully
+          description: Author deleted successfully
         '404':
-          description: Book not found
+          description: Author not found
 
 components:
   schemas:
-    Book:
+    Author:
       type: object
       properties:
-        isbn:
+        id:
           type: string
         name:
+          type: object
+          properties:
+            first_name:
+              type: string
+            middle_name:
+              type: string
+            last_name:
+              type: string
+        dob:
           type: string
-        tags:
+          format: date
+        address:
+          type: object
+          properties:
+            unit:
+              type: string
+            street_name:
+              type: string
+            city:
+              type: string
+            state:
+              type: string
+            country:
+              type: string
+            zipcode:
+              type: string
+            landmark:
+              type: string
+        languages:
           type: array
           items:
             type: string
-        author_name:
-          type: string
-        date_of_publish:
-          type: string
-          format: date
-        publishing_house:
-          type: string
-        number_of_pages:
-          type: integer
-        cost:
-          type: number
-          format: float
       required:
-        - isbn
+        - id
         - name
-        - author_name
-        - date_of_publish
+        - dob
+        - address
+        - languages
