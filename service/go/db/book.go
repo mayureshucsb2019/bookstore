@@ -64,7 +64,7 @@ func (r *BookRepository) CreateBook(book *Book) error {
 
 // GetBookByISBN retrieves a book from the database by its ISBN.
 func (r *BookRepository) GetBookByISBN(isbn string) (*Book, error) {
-	query := `SELECT isbn, name, tags, author_name, date_of_publish, publishing_house, number_of_pages, cost FROM Books WHERE isbn = ?`
+	query := `SELECT * FROM Books WHERE isbn = ?`
 	row := r.DB.QueryRow(query, isbn)
 
 	var book Book

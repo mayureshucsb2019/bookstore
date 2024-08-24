@@ -34,7 +34,7 @@ type DefaultAPIRouter interface {
 // while the service implementation can be ignored with the .openapi-generator-ignore file
 // and updated with the logic required for the API.
 type DefaultAPIServicer interface { 
-	BooksGet(context.Context) (ImplResponse, error)
+	BooksGet(context.Context, int32, int32) (ImplResponse, error)
 	BooksIsbnDelete(context.Context, string) (ImplResponse, error)
 	BooksIsbnGet(context.Context, string) (ImplResponse, error)
 	BooksIsbnPatch(context.Context, string, Book) (ImplResponse, error)

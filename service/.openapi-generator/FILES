@@ -10,6 +10,7 @@ go/error.go
 go/helpers.go
 go/impl.go
 go/logger.go
+go/model__books_get_200_response.go
 go/model_book.go
 go/routers.go
 main.go

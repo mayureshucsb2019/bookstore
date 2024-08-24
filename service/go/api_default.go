@@ -79,9 +79,46 @@ func (c *DefaultAPIController) Routes() Routes {
 	}
 }
 
-// BooksGet - Get a list of all books
+// BooksGet - Get a paginated list of books
 func (c *DefaultAPIController) BooksGet(w http.ResponseWriter, r *http.Request) {
-	result, err := c.service.BooksGet(r.Context())
+	query, err := parseQuery(r.URL.RawQuery)
+	if err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+	var pageNumberParam int32
+	if query.Has("pageNumber") {
+		param, err := parseNumericParameter[int32](
+			query.Get("pageNumber"),
+			WithParse[int32](parseInt32),
+		)
+		if err != nil {
+			c.errorHandler(w, r, &ParsingError{Param: "pageNumber", Err: err}, nil)
+			return
+		}
+
+		pageNumberParam = param
+	} else {
+		var param int32 = 1
+		pageNumberParam = param
+	}
+	var pageSizeParam int32
+	if query.Has("pageSize") {
+		param, err := parseNumericParameter[int32](
+			query.Get("pageSize"),
+			WithParse[int32](parseInt32),
+		)
+		if err != nil {
+			c.errorHandler(w, r, &ParsingError{Param: "pageSize", Err: err}, nil)
+			return
+		}
+
+		pageSizeParam = param
+	} else {
+		var param int32 = 25
+		pageSizeParam = param
+	}
+	result, err := c.service.BooksGet(r.Context(), pageNumberParam, pageSizeParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)

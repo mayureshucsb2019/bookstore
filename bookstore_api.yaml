@@ -7,16 +7,44 @@ info:
 paths:
   /books:
     get:
-      summary: Get a list of all books
+      summary: Get a paginated list of books
+      parameters:
+        - in: query
+          name: pageNumber
+          schema:
+            type: integer
+            default: 1
+          description: The page number to retrieve. Defaults to 1 if not specified.
+        - in: query
+          name: pageSize
+          schema:
+            type: integer
+            default: 25
+          description: The number of items per page. Defaults to 25 if not specified.
       responses:
         '200':
           description: A JSON array of books
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Book'
+                type: object
+                properties:
+                  totalItems:
+                    type: integer
+                    description: Total number of books available.
+                  totalPages:
+                    type: integer
+                    description: Total number of pages.
+                  currentPage:
+                    type: integer
+                    description: The current page number.
+                  pageSize:
+                    type: integer
+                    description: The number of items per page.
+                  books:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Book'
     post:
       summary: Add a new book
       requestBody:

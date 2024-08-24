@@ -34,8 +34,8 @@ func NewDefaultAPIService(repo *db.BookRepository) *DefaultAPIService {
 	}
 }
 
-// BooksGet - Get a list of all books
-func (s *DefaultAPIService) BooksGet(ctx context.Context) (ImplResponse, error) {
+// BooksGet - Get a paginated list of books
+func (s *DefaultAPIService) BooksGet(ctx context.Context, pageNumber int32, pageSize int32) (ImplResponse, error) {
 	// TODO: Uncomment the next line to return response Response(404, {}) or use other options such as http.Ok ...
 	// return Response(404, nil),nil
 	books, err := s.Repo.GetAllBooks()  // Use the repository to get the books
@@ -67,7 +67,7 @@ func (s *DefaultAPIService) BooksIsbnGet(ctx context.Context, isbn string) (Impl
 	if err != nil {
 		return Response(http.StatusInternalServerError, nil), err
 	}
-	
+
 	return Response(http.StatusOK, book), nil
 }
 

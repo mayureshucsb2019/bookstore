@@ -8,16 +8,33 @@ servers:
 paths:
   /books:
     get:
+      parameters:
+      - description: The page number to retrieve. Defaults to 1 if not specified.
+        explode: true
+        in: query
+        name: pageNumber
+        required: false
+        schema:
+          default: 1
+          type: integer
+        style: form
+      - description: The number of items per page. Defaults to 25 if not specified.
+        explode: true
+        in: query
+        name: pageSize
+        required: false
+        schema:
+          default: 25
+          type: integer
+        style: form
       responses:
         "200":
           content:
             application/json:
               schema:
-                items:
-                  $ref: '#/components/schemas/Book'
-                type: array
+                $ref: '#/components/schemas/_books_get_200_response'
           description: A JSON array of books
-      summary: Get a list of all books
+      summary: Get a paginated list of books
     post:
       requestBody:
         content:
@@ -91,8 +108,8 @@ components:
       example:
         author_name: author_name
         publishing_house: publishing_house
-        cost: 6.0274563
-        number_of_pages: 0
+        cost: 2.302136
+        number_of_pages: 5
         isbn: isbn
         name: name
         date_of_publish: 2000-01-23
@@ -125,4 +142,49 @@ components:
       - date_of_publish
       - isbn
       - name
+      type: object
+    _books_get_200_response:
+      example:
+        totalItems: 0
+        books:
+        - author_name: author_name
+          publishing_house: publishing_house
+          cost: 2.302136
+          number_of_pages: 5
+          isbn: isbn
+          name: name
+          date_of_publish: 2000-01-23
+          tags:
+          - tags
+          - tags
+        - author_name: author_name
+          publishing_house: publishing_house
+          cost: 2.302136
+          number_of_pages: 5
+          isbn: isbn
+          name: name
+          date_of_publish: 2000-01-23
+          tags:
+          - tags
+          - tags
+        totalPages: 6
+        pageSize: 5
+        currentPage: 1
+      properties:
+        totalItems:
+          description: Total number of books available.
+          type: integer
+        totalPages:
+          description: Total number of pages.
+          type: integer
+        currentPage:
+          description: The current page number.
+          type: integer
+        pageSize:
+          description: The number of items per page.
+          type: integer
+        books:
+          items:
+            $ref: '#/components/schemas/Book'
+          type: array
       type: object
