@@ -13,6 +13,7 @@ package openapi
 import (
 	"context"
 	"fmt"
+	"time"
 	"net/http"
 	"errors"
 	"database/sql"
@@ -42,9 +43,12 @@ func (s *DefaultAPIService) BooksGet(ctx context.Context, pageNumber int32, page
 	if err != nil {
 		return Response(http.StatusInternalServerError, nil), err
 	}
-	// return Response(200, []Book{}), nil
+	var booksJSON [] map[string]interface{}
+	for _, book := range books{
+		booksJSON = append(booksJSON, convertBookToAPIFormat(book))
+	}
 
-	return Response(http.StatusOK, books), nil
+	return Response(http.StatusOK, booksJSON), nil
 }
 
 // BooksIsbnDelete - Delete a book by ISBN
@@ -68,7 +72,7 @@ func (s *DefaultAPIService) BooksIsbnGet(ctx context.Context, isbn string) (Impl
 		return Response(http.StatusInternalServerError, nil), err
 	}
 
-	return Response(http.StatusOK, book), nil
+	return Response(http.StatusOK, convertBookToAPIFormat(*book)), nil
 }
 
 // BooksIsbnPatch - Update a book by ISBN
@@ -120,4 +124,24 @@ func convertToDBBook(book Book) db.Book {
 		Cost:            float64(book.Cost),       // Convert float32 to float64
 	}
 	return dbBook
+}
+
+// convertBookToAPIFormat converts internal book format to API format
+func convertBookToAPIFormat(book db.Book) map[string]interface{} {
+    // Custom date format
+    dateFormat := "01/02/06" // Date format: MM/DD/YY
+    parsedDate, _ := time.Parse("2006-01-02", book.DateOfPublish)
+    formattedDate := parsedDate.Format(dateFormat)
+
+    // Prepare the API response
+    return map[string]interface{}{
+        "isbn":             book.ISBN,
+        "name":             book.Name,
+        "tags":             book.Tags,
+        "author_name":      book.AuthorName,
+        "date_of_publish":  formattedDate,
+        "publishing_house": book.PublishingHouse,
+        "number_of_pages":  book.NumberOfPages,
+        "cost":             book.Cost,
+    }
 }

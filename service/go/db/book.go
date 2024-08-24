@@ -2,6 +2,7 @@ package db
 
 import (
 	"database/sql"
+	"encoding/json"
 	"errors"
 	"fmt"
 
@@ -56,9 +57,13 @@ func InitDB(config DBConfig) (*sql.DB, error) {
 
 // CreateBook inserts a new book into the database.
 func (r *BookRepository) CreateBook(book *Book) error {
+	tagsJSON, err := json.Marshal(book.Tags)
+	if err != nil {
+		return err
+	}
 	query := `INSERT INTO Books (isbn, name, tags, author_name, date_of_publish, publishing_house, number_of_pages, cost) 
               VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
-	_, err := r.DB.Exec(query, book.ISBN, book.Name, fmt.Sprintf("%v", book.Tags), book.AuthorName, book.DateOfPublish, book.PublishingHouse, book.NumberOfPages, book.Cost)
+	_, err = r.DB.Exec(query, book.ISBN, book.Name, tagsJSON, book.AuthorName, book.DateOfPublish, book.PublishingHouse, book.NumberOfPages, book.Cost)
 	return err
 }
 
@@ -86,8 +91,12 @@ func (r *BookRepository) GetBookByISBN(isbn string) (*Book, error) {
 
 // UpdateBook updates an existing book record in the database.
 func (r *BookRepository) UpdateBook(book *Book) error {
+	tagsJSON, err := json.Marshal(book.Tags)
+	if err != nil {
+		return err
+	}
 	query := `UPDATE Books SET name=?, tags=?, author_name=?, date_of_publish=?, publishing_house=?, number_of_pages=?, cost=? WHERE isbn=?`
-	_, err := r.DB.Exec(query, book.Name, fmt.Sprintf("%v", book.Tags), book.AuthorName, book.DateOfPublish, book.PublishingHouse, book.NumberOfPages, book.Cost, book.ISBN)
+	_, err = r.DB.Exec(query, book.Name, tagsJSON, book.AuthorName, book.DateOfPublish, book.PublishingHouse, book.NumberOfPages, book.Cost, book.ISBN)
 	return err
 }
 
@@ -122,7 +131,11 @@ func (r *BookRepository) GetAllBooks() ([]Book, error) {
 }
 
 // Helper function to parse tags from a string to a slice.
-func parseTags(tags string) []string {
-	// Implement the logic to convert the tags string back to a slice
-	return []string{"Check"} // Placeholder: implement your tag parsing logic
+func parseTags(tagsStr string) []string {
+	var tags []string
+	err := json.Unmarshal([]byte(tagsStr), &tags)
+	if err != nil {
+		return []string{"Error prcessing tags!"}
+	}
+	return tags
 }
