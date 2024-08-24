@@ -6,8 +6,8 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_PASSWORD: ${MYSQL_ADMIN_PASSWORD}
-      MYSQL_DATABASE: bookstore
-      MYSQL_USER: bstore
+      MYSQL_DATABASE: ${MYSQL_DATABASE_NAME}
+      MYSQL_USER: ${MYSQL_DATABASE_USER}
     ports:
       - "3306:3306"
     volumes:
