@@ -11,15 +11,16 @@
 package main
 
 import (
+	"database/sql"
+	"encoding/json"
+	"io"
 	"log"
 	"net/http"
-	"io"
-	"encoding/json"
 	"os"
-	"database/sql"
 
-	openapi "github.com/mayureshucsb2019/bookstore/go"
-	"github.com/mayureshucsb2019/bookstore/go/db"
+	"github.com/mayureshucsb2019/bookstore/go/book/db"
+	book_service "github.com/mayureshucsb2019/bookstore/go/book/service"
+	"github.com/mayureshucsb2019/bookstore/go/common"
 )
 
 type Config struct {
@@ -85,10 +86,10 @@ func main() {
 
 	log.Printf("Server started")
 
-	DefaultAPIService := openapi.NewDefaultAPIService(bookRepo)
-	DefaultAPIController := openapi.NewDefaultAPIController(DefaultAPIService)
+	bookAPIService := book_service.NewDefaultAPIService(bookRepo)
+	bookAPIController := book_service.NewDefaultAPIController(bookAPIService)
 
-	router := openapi.NewRouter(DefaultAPIController)
+	router := common.NewRouter(bookAPIController)
 
 	log.Fatal(http.ListenAndServe(":8080", router))
 }
