@@ -1,1 +1,7 @@
+* These are schemas for the tables to be created in the docker image of mysql
 
+# TODO @mayureshnanad
+* Auto populate some fake data in the tables
+* Add some migration changes to have some migrations
+* Need to add some database tests
+* Create init.sql file, so that we dont need to add these desciptions in docker-compose and Dockerfile

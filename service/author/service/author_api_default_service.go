@@ -72,7 +72,7 @@ func (s *DefaultAPIService) AuthorsIdPatch(ctx context.Context, id string, autho
 	// return Response(404, nil),nil
 	// Check if the provided ISBN in the request path matches the ISBN in the body
 	if author.Id != id {
-		return common.Response(http.StatusBadRequest, nil), errors.New("Id in the path does not match Id in the body")
+		return common.Response(http.StatusBadRequest, nil), errors.New("id in the path does not match id in the body")
 	}
 
 	// Call the repository method to update the book
