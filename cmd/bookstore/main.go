@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"encoding/json"
+	"flag"
 	"io"
 	"log"
 	"net/http"
@@ -48,7 +49,8 @@ func loadConfig(filePath string) (Config, error) {
 func main() {
 
 	// Load configuration from file
-	config, err := loadConfig("config.json")
+	configFile := flag.String("config", "config.json", "path to the configuration file")
+	config, err := loadConfig(*configFile)
 	if err != nil {
 		log.Fatalf("Error loading config: %v", err)
 	}
