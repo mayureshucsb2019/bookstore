@@ -4,8 +4,8 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/mayureshucsb2019/bookstore/go/author/models"
-	"github.com/mayureshucsb2019/bookstore/go/common"
+	"github.com/mayureshucsb2019/bookstore/service/go/author/models"
+	"github.com/mayureshucsb2019/bookstore/service/go/common"
 )
 
 // DefaultAPIRouter defines the required methods for binding the api requests to a responses for the DefaultAPI

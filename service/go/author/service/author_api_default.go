@@ -6,8 +6,8 @@ import (
 	"strings"
 
 	"github.com/gorilla/mux"
-	"github.com/mayureshucsb2019/bookstore/go/author/models"
-	"github.com/mayureshucsb2019/bookstore/go/common"
+	"github.com/mayureshucsb2019/bookstore/service/go/author/models"
+	"github.com/mayureshucsb2019/bookstore/service/go/common"
 )
 
 // DefaultAPIController binds http requests to an api service and writes the service results to the http response

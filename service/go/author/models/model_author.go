@@ -1,6 +1,6 @@
 package models
 
-import "github.com/mayureshucsb2019/bookstore/go/common"
+import "github.com/mayureshucsb2019/bookstore/service/go/common"
 
 type Author struct {
 	Id string `json:"id"`

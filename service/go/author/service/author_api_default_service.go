@@ -5,9 +5,9 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/mayureshucsb2019/bookstore/go/author/db"
-	"github.com/mayureshucsb2019/bookstore/go/author/models"
-	"github.com/mayureshucsb2019/bookstore/go/common"
+	"github.com/mayureshucsb2019/bookstore/service/go/author/db"
+	"github.com/mayureshucsb2019/bookstore/service/go/author/models"
+	"github.com/mayureshucsb2019/bookstore/service/go/common"
 )
 
 // DefaultAPIService is a service that implements the logic for the DefaultAPIServicer
