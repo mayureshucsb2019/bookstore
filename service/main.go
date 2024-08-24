@@ -8,7 +8,9 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/mayureshucsb2019/bookstore/go/book/db"
+	author_db "github.com/mayureshucsb2019/bookstore/go/author/db"
+	author_service "github.com/mayureshucsb2019/bookstore/go/author/service"
+	book_db "github.com/mayureshucsb2019/bookstore/go/book/db"
 	book_service "github.com/mayureshucsb2019/bookstore/go/book/service"
 	"github.com/mayureshucsb2019/bookstore/go/common"
 )
@@ -52,14 +54,14 @@ func main() {
 	}
 
 	// Initialize DB connection
-	dbConn, err := db.InitDB(db.DBConfig{
+	dbConn, err := common.InitDB(common.DBConfig{
 		Username: config.Username,
 		Password: config.Password,
 		Host:     config.Host,
 		Port:     config.Port,
 		DBName:   config.DBName,
 	})
-	// InitDB(username, password, host, port, dbname string)
+
 	if err != nil {
 		log.Fatalf("Failed to connect to the database: %v", err)
 	}
@@ -71,13 +73,18 @@ func main() {
 	}
 	log.Printf("Database connection is successful")
 
-	// Create the repository with the DB connection
-	bookRepo := db.NewBookRepository(dbConn)
+	// Create the book repository with the DB connection
+	bookRepo := book_db.NewBookRepository(dbConn)
 	bookAPIService := book_service.NewDefaultAPIService(bookRepo)
 	bookAPIController := book_service.NewDefaultAPIController(bookAPIService)
 
+	// Create the author repository with the DB connection
+	authorRepo := author_db.NewAuthorRepository(dbConn)
+	authorAPIService := author_service.NewDefaultAPIService(authorRepo)
+	authorAPIController := author_service.NewDefaultAPIController(authorAPIService)
+
 	log.Printf("Server started")
-	router := common.NewRouter(bookAPIController)
+	router := common.NewRouter(bookAPIController, authorAPIController)
 
 	log.Fatal(http.ListenAndServe(":8080", router))
 }

@@ -21,14 +21,6 @@ type Book struct {
 	Cost            float64
 }
 
-type DBConfig struct {
-	Username string
-	Password string
-	Host     string
-	Port     string
-	DBName   string
-}
-
 // BookRepository provides access to the book storage.
 type BookRepository struct {
 	DB *sql.DB
@@ -37,22 +29,6 @@ type BookRepository struct {
 // NewBookRepository creates a new BookRepository with a database connection.
 func NewBookRepository(db *sql.DB) *BookRepository {
 	return &BookRepository{DB: db}
-}
-
-// InitDB initializes and returns a MySQL database connection.
-func InitDB(config DBConfig) (*sql.DB, error) {
-	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", config.Username, config.Password, config.Host, config.Port, config.DBName)
-	db, err := sql.Open("mysql", dsn)
-	if err != nil {
-		return nil, err
-	}
-
-	// Test the connection
-	if err = db.Ping(); err != nil {
-		return nil, err
-	}
-
-	return db, nil
 }
 
 // CreateBook inserts a new book into the database.

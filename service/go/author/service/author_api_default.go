@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/gorilla/mux"
-	"github.com/mayureshucsb2019/bookstore/go/book/models"
+	"github.com/mayureshucsb2019/bookstore/go/author/models"
 	"github.com/mayureshucsb2019/bookstore/go/common"
 )
 
@@ -43,36 +43,36 @@ func NewDefaultAPIController(s DefaultAPIServicer, opts ...DefaultAPIOption) *De
 // Routes returns all the api routes for the DefaultAPIController
 func (c *DefaultAPIController) Routes() common.Routes {
 	return common.Routes{
-		"BooksGet": common.Route{
+		"AuthorsGet": common.Route{
 			Method:      strings.ToUpper("Get"),
-			Pattern:     "/books",
-			HandlerFunc: c.BooksGet,
+			Pattern:     "/authors",
+			HandlerFunc: c.AuthorsGet,
 		},
-		"BooksIsbnDelete": common.Route{
+		"AuthorsIdDelete": common.Route{
 			Method:      strings.ToUpper("Delete"),
-			Pattern:     "/books/{isbn}",
-			HandlerFunc: c.BooksIsbnDelete,
+			Pattern:     "/authors/{id}",
+			HandlerFunc: c.AuthorsIdDelete,
 		},
-		"BooksIsbnGet": common.Route{
+		"AuthorsIdGet": common.Route{
 			Method:      strings.ToUpper("Get"),
-			Pattern:     "/books/{isbn}",
-			HandlerFunc: c.BooksIsbnGet,
+			Pattern:     "/authors/{id}",
+			HandlerFunc: c.AuthorsIdGet,
 		},
-		"BooksIsbnPatch": common.Route{
+		"AuthorsIdPatch": common.Route{
 			Method:      strings.ToUpper("Patch"),
-			Pattern:     "/books/{isbn}",
-			HandlerFunc: c.BooksIsbnPatch,
+			Pattern:     "/authors/{id}",
+			HandlerFunc: c.AuthorsIdPatch,
 		},
-		"BooksPost": common.Route{
+		"AuthorsPost": common.Route{
 			Method:      strings.ToUpper("Post"),
-			Pattern:     "/books",
-			HandlerFunc: c.BooksPost,
+			Pattern:     "/authors",
+			HandlerFunc: c.AuthorsPost,
 		},
 	}
 }
 
-// BooksGet - Get a paginated list of books
-func (c *DefaultAPIController) BooksGet(w http.ResponseWriter, r *http.Request) {
+// AuthorsGet - Get a list of authors
+func (c *DefaultAPIController) AuthorsGet(w http.ResponseWriter, r *http.Request) {
 	query, err := common.ParseQuery(r.URL.RawQuery)
 	if err != nil {
 		c.errorHandler(w, r, &common.ParsingError{Err: err}, nil)
@@ -110,7 +110,7 @@ func (c *DefaultAPIController) BooksGet(w http.ResponseWriter, r *http.Request) 
 		var param int32 = 25
 		pageSizeParam = param
 	}
-	result, err := c.service.BooksGet(r.Context(), pageNumberParam, pageSizeParam)
+	result, err := c.service.AuthorsGet(r.Context(), pageNumberParam, pageSizeParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -120,15 +120,15 @@ func (c *DefaultAPIController) BooksGet(w http.ResponseWriter, r *http.Request) 
 	_ = common.EncodeJSONResponse(result.Body, &result.Code, w)
 }
 
-// BooksIsbnDelete - Delete a book by ISBN
-func (c *DefaultAPIController) BooksIsbnDelete(w http.ResponseWriter, r *http.Request) {
+// AuthorsIdDelete - Delete an author by ID
+func (c *DefaultAPIController) AuthorsIdDelete(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
-	isbnParam := params["isbn"]
-	if isbnParam == "" {
-		c.errorHandler(w, r, &common.RequiredError{Field: "isbn"}, nil)
+	idParam := params["id"]
+	if idParam == "" {
+		c.errorHandler(w, r, &common.RequiredError{Field: "id"}, nil)
 		return
 	}
-	result, err := c.service.BooksIsbnDelete(r.Context(), isbnParam)
+	result, err := c.service.AuthorsIdDelete(r.Context(), idParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -138,15 +138,15 @@ func (c *DefaultAPIController) BooksIsbnDelete(w http.ResponseWriter, r *http.Re
 	_ = common.EncodeJSONResponse(result.Body, &result.Code, w)
 }
 
-// BooksIsbnGet - Get a specific book by ISBN
-func (c *DefaultAPIController) BooksIsbnGet(w http.ResponseWriter, r *http.Request) {
+// AuthorsIdGet - Get a specific author by ID
+func (c *DefaultAPIController) AuthorsIdGet(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
-	isbnParam := params["isbn"]
-	if isbnParam == "" {
-		c.errorHandler(w, r, &common.RequiredError{Field: "isbn"}, nil)
+	idParam := params["id"]
+	if idParam == "" {
+		c.errorHandler(w, r, &common.RequiredError{Field: "id"}, nil)
 		return
 	}
-	result, err := c.service.BooksIsbnGet(r.Context(), isbnParam)
+	result, err := c.service.AuthorsIdGet(r.Context(), idParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -156,30 +156,30 @@ func (c *DefaultAPIController) BooksIsbnGet(w http.ResponseWriter, r *http.Reque
 	_ = common.EncodeJSONResponse(result.Body, &result.Code, w)
 }
 
-// BooksIsbnPatch - Update a book by ISBN
-func (c *DefaultAPIController) BooksIsbnPatch(w http.ResponseWriter, r *http.Request) {
+// AuthorsIdPatch - Update an author by ID
+func (c *DefaultAPIController) AuthorsIdPatch(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
-	isbnParam := params["isbn"]
-	if isbnParam == "" {
-		c.errorHandler(w, r, &common.RequiredError{Field: "isbn"}, nil)
+	idParam := params["id"]
+	if idParam == "" {
+		c.errorHandler(w, r, &common.RequiredError{Field: "id"}, nil)
 		return
 	}
-	bookParam := models.Book{}
+	authorParam := models.Author{}
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
-	if err := d.Decode(&bookParam); err != nil {
+	if err := d.Decode(&authorParam); err != nil {
 		c.errorHandler(w, r, &common.ParsingError{Err: err}, nil)
 		return
 	}
-	if err := models.AssertBookRequired(bookParam); err != nil {
+	if err := models.AssertAuthorRequired(authorParam); err != nil {
 		c.errorHandler(w, r, err, nil)
 		return
 	}
-	if err := models.AssertBookConstraints(bookParam); err != nil {
+	if err := models.AssertAuthorConstraints(authorParam); err != nil {
 		c.errorHandler(w, r, err, nil)
 		return
 	}
-	result, err := c.service.BooksIsbnPatch(r.Context(), isbnParam, bookParam)
+	result, err := c.service.AuthorsIdPatch(r.Context(), idParam, authorParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -189,24 +189,24 @@ func (c *DefaultAPIController) BooksIsbnPatch(w http.ResponseWriter, r *http.Req
 	_ = common.EncodeJSONResponse(result.Body, &result.Code, w)
 }
 
-// BooksPost - Add a new book
-func (c *DefaultAPIController) BooksPost(w http.ResponseWriter, r *http.Request) {
-	bookParam := models.Book{}
+// AuthorsPost - Add a new author
+func (c *DefaultAPIController) AuthorsPost(w http.ResponseWriter, r *http.Request) {
+	authorParam := models.Author{}
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
-	if err := d.Decode(&bookParam); err != nil {
+	if err := d.Decode(&authorParam); err != nil {
 		c.errorHandler(w, r, &common.ParsingError{Err: err}, nil)
 		return
 	}
-	if err := models.AssertBookRequired(bookParam); err != nil {
+	if err := models.AssertAuthorRequired(authorParam); err != nil {
 		c.errorHandler(w, r, err, nil)
 		return
 	}
-	if err := models.AssertBookConstraints(bookParam); err != nil {
+	if err := models.AssertAuthorConstraints(authorParam); err != nil {
 		c.errorHandler(w, r, err, nil)
 		return
 	}
-	result, err := c.service.BooksPost(r.Context(), bookParam)
+	result, err := c.service.AuthorsPost(r.Context(), authorParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)

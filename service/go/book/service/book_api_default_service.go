@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/mayureshucsb2019/bookstore/go/book/db"
-	book_models "github.com/mayureshucsb2019/bookstore/go/book/models"
+	"github.com/mayureshucsb2019/bookstore/go/book/models"
 	"github.com/mayureshucsb2019/bookstore/go/common"
 )
 
@@ -67,7 +67,7 @@ func (s *DefaultAPIService) BooksIsbnGet(ctx context.Context, isbn string) (comm
 }
 
 // BooksIsbnPatch - Update a book by ISBN
-func (s *DefaultAPIService) BooksIsbnPatch(ctx context.Context, isbn string, book book_models.Book) (common.ImplResponse, error) {
+func (s *DefaultAPIService) BooksIsbnPatch(ctx context.Context, isbn string, book models.Book) (common.ImplResponse, error) {
 	// TODO: Uncomment the next line to return response Response(404, {}) or use other options such as http.Ok ...
 	// return Response(404, nil),nil
 	// Check if the provided ISBN in the request path matches the ISBN in the body
@@ -89,7 +89,7 @@ func (s *DefaultAPIService) BooksIsbnPatch(ctx context.Context, isbn string, boo
 }
 
 // BooksPost - Add a new book
-func (s *DefaultAPIService) BooksPost(ctx context.Context, book book_models.Book) (common.ImplResponse, error) {
+func (s *DefaultAPIService) BooksPost(ctx context.Context, book models.Book) (common.ImplResponse, error) {
 	// TODO: Uncomment the next line to return response Response(404, {}) or use other options such as http.Ok ...
 	// return Response(404, nil),nil
 	dbBook := convertToDBBook(book)
@@ -103,7 +103,7 @@ func (s *DefaultAPIService) BooksPost(ctx context.Context, book book_models.Book
 }
 
 // Convert Book to db.Book
-func convertToDBBook(book book_models.Book) db.Book {
+func convertToDBBook(book models.Book) db.Book {
 	dbBook := db.Book{
 		ISBN:            book.Isbn,
 		Name:            book.Name,

@@ -4,7 +4,7 @@
 * brew install openapi-generator  # On MacOS
 
 # How to autogenerate server files from bookstore_api.yaml
-* RUN $ openapi-generator generate -i bookstore_api.yaml -g go-server -o ./service
+* RUN $ openapi-generator generate -i <file-name>.yaml -g go-server -o ./service
 * change go.mod to have module github.com/mayureshucsb2019/bookstore instead of module github.com/GIT_USER_ID/GIT_REPO_ID
 * change main.go to import openapi "github.com/mayureshucsb2019/bookstore/go" instead of import github.com/GIT_USER_ID/GIT_REPO_ID
 * go get github.com/gorilla/mux
