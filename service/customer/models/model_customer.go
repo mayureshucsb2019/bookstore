@@ -1,8 +1,6 @@
 package models
 
 import (
-	"time"
-
 	"github.com/mayureshucsb2019/bookstore/service/common"
 )
 
@@ -16,10 +14,6 @@ type Customer struct {
 	DOB string `json:"dob"`
 
 	Address CustomerAddress `json:"address"`
-
-	RegistrationDate time.Time `json:"registration_date,omitempty"`
-
-	LastLogin time.Time `json:"last_login,omitempty"`
 
 	Status string `json:"status,omitempty"`
 

@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"log"
 
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -54,19 +55,23 @@ func NewCustomerRepository(db *sql.DB) *CustomerRepository {
 
 // CreateCustomer inserts a new Customer into the database.
 func (r *CustomerRepository) CreateCustomer(customer *Customer) error {
+	languagesJSON, err := json.Marshal(customer.Languages)
+	if err != nil {
+		log.Fatalf("Failed to marshal languages to JSON: %v", err)
+	}
 	// Prepare the SQL insert statement
 	query := `
 		INSERT INTO Customer (
 			email, first_name, middle_name, last_name, phone_number, dob,
 			unit_no, street_name, city, state, country, zipcode, landmark,
-			registration_date, last_login, status, notes, languages
+			last_login, status, notes, languages
 		) VALUES (
-			?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+			?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
 		)
 	`
 
 	// Execute the SQL statement
-	_, err := r.DB.Exec(query,
+	_, err = r.DB.Exec(query,
 		customer.Email,
 		customer.FirstName,
 		customer.MiddleName,
@@ -80,11 +85,10 @@ func (r *CustomerRepository) CreateCustomer(customer *Customer) error {
 		customer.Country,
 		customer.Zipcode,
 		customer.Landmark,
-		customer.RegistrationDate,
 		customer.LastLogin,
 		customer.Status,
 		customer.Notes,
-		customer.Languages,
+		languagesJSON,
 	)
 	if err != nil {
 		return fmt.Errorf("failed to insert customer: %w", err)
@@ -98,11 +102,15 @@ func (r *CustomerRepository) GetCustomerByID(email string) (*Customer, error) {
 	// Prepare the SQL select statement
 	query := `SELECT * FROM Customer WHERE email = ?`
 
-	// Execute the query
+	// Declare a variable to hold the Customer data
+	var customer Customer
+
+	// Temporary variable to hold the JSON data
+	var languagesJSON []byte
+
+	// Execute the query and scan the result into the customer variable
 	row := r.DB.QueryRow(query, email)
 
-	// Scan the result into a Customer struct
-	var customer Customer
 	err := row.Scan(
 		&customer.Email,
 		&customer.FirstName,
@@ -121,18 +129,82 @@ func (r *CustomerRepository) GetCustomerByID(email string) (*Customer, error) {
 		&customer.LastLogin,
 		&customer.Status,
 		&customer.Notes,
-		&customer.Languages,
+		&languagesJSON,
 	)
+
 	if err != nil {
 		if err == sql.ErrNoRows {
 			// No customer found with the given email
-			return nil, nil
+			return nil, fmt.Errorf("customer with id %s not found", email)
 		}
 		// Other errors
 		return nil, fmt.Errorf("failed to retrieve customer: %w", err)
 	}
 
+	// Unmarshal the JSON data into a []string slice
+	var languages []string
+	if len(languagesJSON) > 0 { // Check if languagesJSON is not empty
+		if err := json.Unmarshal(languagesJSON, &languages); err != nil {
+			return nil, fmt.Errorf("failed to unmarshal languages: %w", err)
+		}
+	}
+	customer.Languages = languages
+
 	return &customer, nil
+}
+
+// UpdateCustomer updates an existing Customer record in the database.
+func (r *CustomerRepository) UpdateCustomer(customer *Customer) error {
+	// Prepare the SQL update statement
+	query := `
+		UPDATE Customer
+		SET
+			first_name = ?, 
+			middle_name = ?, 
+			last_name = ?, 
+			phone_number = ?, 
+			dob = ?, 
+			unit_no = ?, 
+			street_name = ?, 
+			city = ?, 
+			state = ?, 
+			country = ?, 
+			zipcode = ?, 
+			landmark = ?, 
+			registration_date = ?, 
+			last_login = ?, 
+			status = ?, 
+			notes = ?, 
+			languages = ?
+		WHERE email = ?
+	`
+
+	// Execute the SQL statement
+	_, err := r.DB.Exec(query,
+		customer.FirstName,
+		customer.MiddleName,
+		customer.LastName,
+		customer.PhoneNumber,
+		customer.Dob,
+		customer.UnitNo,
+		customer.StreetName,
+		customer.City,
+		customer.State,
+		customer.Country,
+		customer.Zipcode,
+		customer.Landmark,
+		customer.RegistrationDate,
+		customer.LastLogin,
+		customer.Status,
+		customer.Notes,
+		customer.Languages,
+		customer.Email, // Email is used as the unique identifier
+	)
+	if err != nil {
+		return fmt.Errorf("failed to update customer: %w", err)
+	}
+
+	return nil
 }
 
 // DeleteCustomer removes a Customer from the database by their email.
@@ -177,6 +249,9 @@ func (r *CustomerRepository) GetAllCustomers() ([]Customer, error) {
 	// Iterate over the rows
 	for rows.Next() {
 		var customer Customer
+		// Temporary variable to hold the JSON data
+		var languagesJSON []byte
+
 		err := rows.Scan(
 			&customer.Email,
 			&customer.FirstName,
@@ -195,11 +270,19 @@ func (r *CustomerRepository) GetAllCustomers() ([]Customer, error) {
 			&customer.LastLogin,
 			&customer.Status,
 			&customer.Notes,
-			&customer.Languages,
+			&languagesJSON,
 		)
 		if err != nil {
 			return nil, fmt.Errorf("failed to scan customer: %w", err)
 		}
+
+		// Unmarshal the languages JSON byte slice into a []string slice
+		if len(languagesJSON) > 0 {
+			if err := json.Unmarshal(languagesJSON, &customer.Languages); err != nil {
+				return nil, fmt.Errorf("failed to unmarshal languages: %w", err)
+			}
+		}
+
 		customers = append(customers, customer)
 	}
 

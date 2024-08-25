@@ -59,6 +59,7 @@ func (s *DefaultAPIService) AuthorsIdGet(ctx context.Context, id string) (common
 	// TODO: Uncomment the next line to return response Response(404, {}) or use other options such as http.Ok ...
 	// return Response(404, nil),nil
 	author, err := s.Repo.GetAuthorByID(id) // Use the repository to get the books
+
 	if err != nil {
 		return common.Response(http.StatusInternalServerError, nil), err
 	}
@@ -107,26 +108,18 @@ func convertApiToDBAuthor(author models.Author) db.Author {
 	return db.Author{
 		ID:         author.Id,
 		FirstName:  author.Name.FirstName,
-		MiddleName: nullStringOrNil(author.Name.MiddleName),
+		MiddleName: common.NullStringOrNil(author.Name.MiddleName),
 		LastName:   author.Name.LastName,
-		DOB:        nullStringOrNil(author.DOB),
-		UnitNo:     nullStringOrNil(author.Address.Unit),
-		StreetName: nullStringOrNil(author.Address.StreetName),
-		City:       nullStringOrNil(author.Address.City),
-		State:      nullStringOrNil(author.Address.State),
-		Country:    nullStringOrNil(author.Address.Country),
-		Zipcode:    nullStringOrNil(author.Address.Zipcode),
-		Landmark:   nullStringOrNil(author.Address.Landmark),
+		DOB:        common.NullStringOrNil(author.DOB),
+		UnitNo:     common.NullStringOrNil(author.Address.Unit),
+		StreetName: common.NullStringOrNil(author.Address.StreetName),
+		City:       common.NullStringOrNil(author.Address.City),
+		State:      common.NullStringOrNil(author.Address.State),
+		Country:    common.NullStringOrNil(author.Address.Country),
+		Zipcode:    common.NullStringOrNil(author.Address.Zipcode),
+		Landmark:   common.NullStringOrNil(author.Address.Landmark),
 		Languages:  author.Languages,
 	}
-}
-
-// Convert a string to sql.NullString. Returns a NullString with valid value or null.
-func nullStringOrNil(value string) sql.NullString {
-	if value == "" {
-		return sql.NullString{Valid: false}
-	}
-	return sql.NullString{String: value, Valid: true}
 }
 
 // ConvertDBToAPIResponse converts the DB model to the API model
@@ -135,27 +128,19 @@ func convertDBToAPIResponse(db db.Author) models.Author {
 		Id: db.ID,
 		Name: models.AuthorName{
 			FirstName:  db.FirstName,
-			MiddleName: stringOrEmpty(db.MiddleName),
+			MiddleName: common.StringOrEmpty(db.MiddleName),
 			LastName:   db.LastName,
 		},
-		DOB: stringOrEmpty(db.DOB),
+		DOB: common.StringOrEmpty(db.DOB),
 		Address: models.AuthorAddress{
-			Unit:       stringOrEmpty(db.UnitNo),
-			StreetName: stringOrEmpty(db.StreetName),
-			City:       stringOrEmpty(db.City),
-			State:      stringOrEmpty(db.State),
-			Country:    stringOrEmpty(db.Country),
-			Zipcode:    stringOrEmpty(db.Zipcode),
-			Landmark:   stringOrEmpty(db.Landmark),
+			Unit:       common.StringOrEmpty(db.UnitNo),
+			StreetName: common.StringOrEmpty(db.StreetName),
+			City:       common.StringOrEmpty(db.City),
+			State:      common.StringOrEmpty(db.State),
+			Country:    common.StringOrEmpty(db.Country),
+			Zipcode:    common.StringOrEmpty(db.Zipcode),
+			Landmark:   common.StringOrEmpty(db.Landmark),
 		},
 		Languages: db.Languages,
 	}
-}
-
-// Helper function to convert sql.NullString to string
-func stringOrEmpty(ns sql.NullString) string {
-	if ns.Valid {
-		return ns.String
-	}
-	return ""
 }

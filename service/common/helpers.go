@@ -1,7 +1,9 @@
 package common
 
 import (
+	"database/sql"
 	"reflect"
+	"time"
 )
 
 // Response return a ImplResponse struct filled
@@ -48,4 +50,28 @@ func AssertRecurseValueRequired[T any](value reflect.Value, callback func(T) err
 		}
 	}
 	return nil
+}
+
+// Helper function to convert sql.NullString to string
+func StringOrEmpty(ns sql.NullString) string {
+	if ns.Valid {
+		return ns.String
+	}
+	return ""
+}
+
+// Convert a string to sql.NullString. Returns a NullString with valid value or null.
+func NullStringOrNil(value string) sql.NullString {
+	if value == "" {
+		return sql.NullString{Valid: false}
+	}
+	return sql.NullString{String: value, Valid: true}
+}
+
+// Helper function to convert time.Time to sql.NullString
+func TimeToNullString(t time.Time) sql.NullString {
+	if t.IsZero() {
+		return sql.NullString{Valid: false}
+	}
+	return sql.NullString{String: t.Format(time.RFC3339), Valid: true}
 }
