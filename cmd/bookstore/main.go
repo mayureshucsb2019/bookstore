@@ -8,13 +8,11 @@ import (
 	"net/http"
 	"os"
 
-	author_db "github.com/mayureshucsb2019/bookstore/service/author/db"
 	author_service "github.com/mayureshucsb2019/bookstore/service/author/service"
-	book_db "github.com/mayureshucsb2019/bookstore/service/book/db"
 	book_service "github.com/mayureshucsb2019/bookstore/service/book/service"
 	"github.com/mayureshucsb2019/bookstore/service/common"
-	customer_db "github.com/mayureshucsb2019/bookstore/service/customer/db"
 	customer_service "github.com/mayureshucsb2019/bookstore/service/customer/service"
+	"github.com/mayureshucsb2019/bookstore/service/factory"
 )
 
 type Config struct {
@@ -70,18 +68,21 @@ func main() {
 	}
 	defer dbConn.Close()
 
+	// Get the repository factory
+	repoFactory := factory.GetRepositoryFactory(dbConn)
+
 	// Create the book repository with the DB connection
-	bookRepo := book_db.NewBookRepository(dbConn)
+	bookRepo := repoFactory.CreateBookRepository()
 	bookAPIService := book_service.NewDefaultAPIService(bookRepo)
 	bookAPIController := book_service.NewDefaultAPIController(bookAPIService)
 
 	// Create the author repository with the DB connection
-	authorRepo := author_db.NewAuthorRepository(dbConn)
+	authorRepo := repoFactory.CreateAuthorRepository()
 	authorAPIService := author_service.NewDefaultAPIService(authorRepo)
 	authorAPIController := author_service.NewDefaultAPIController(authorAPIService)
 
 	// Create the author repository with the DB connection
-	customerRepo := customer_db.NewCustomerRepository(dbConn)
+	customerRepo := repoFactory.CreateCustomerRepository()
 	customerAPIService := customer_service.NewDefaultAPIService(customerRepo)
 	customerAPIController := customer_service.NewDefaultAPIController(customerAPIService)
 
