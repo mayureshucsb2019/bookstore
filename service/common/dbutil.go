@@ -37,8 +37,10 @@ func GetDBInstance(config DBConfig) (*DBConnection, error) {
 
 	// Test the connection
 	if err := dbInstance.DB.Ping(); err != nil {
+		log.Fatalf("Database connection error %+v", err)
 		return nil, err
 	}
+	log.Printf("Database connection is successful")
 
 	return dbInstance, nil
 }

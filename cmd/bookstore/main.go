@@ -70,12 +70,6 @@ func main() {
 	}
 	defer dbConn.Close()
 
-	// Test the connection
-	if err := TestDBConnection(dbConn); err != nil {
-		log.Fatalf("Failed to connect to the database: %v", err)
-	}
-	log.Printf("Database connection is successful")
-
 	// Create the book repository with the DB connection
 	bookRepo := book_db.NewBookRepository(dbConn)
 	bookAPIService := book_service.NewDefaultAPIService(bookRepo)
@@ -95,12 +89,4 @@ func main() {
 	router := common.NewRouter(bookAPIController, authorAPIController, customerAPIController)
 
 	log.Fatal(http.ListenAndServe(":8080", router))
-}
-
-// TestDBConnection tests the database connection
-func TestDBConnection(dbConn *common.DBConnection) error {
-	if err := dbConn.DB.Ping(); err != nil {
-		return err
-	}
-	return nil
 }
