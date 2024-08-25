@@ -7,6 +7,7 @@ import (
 	"log"
 
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/mayureshucsb2019/bookstore/service/common"
 )
 
 // Customer represents the structure of a Customer record in the database.
@@ -49,8 +50,8 @@ type CustomerRepository struct {
 }
 
 // NewCustomerRepository creates a new CustomerRepository with a database connection.
-func NewCustomerRepository(db *sql.DB) *CustomerRepository {
-	return &CustomerRepository{DB: db}
+func NewCustomerRepository(dbConn *common.DBConnection) *CustomerRepository {
+	return &CustomerRepository{DB: dbConn.DB}
 }
 
 // CreateCustomer inserts a new Customer into the database.

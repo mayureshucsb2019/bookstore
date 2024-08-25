@@ -1,7 +1,6 @@
 package main
 
 import (
-	"database/sql"
 	"encoding/json"
 	"flag"
 	"io"
@@ -58,7 +57,7 @@ func main() {
 	}
 
 	// Initialize DB connection
-	dbConn, err := common.InitDB(common.DBConfig{
+	dbConn, err := common.GetDBInstance(common.DBConfig{
 		Username: config.Username,
 		Password: config.Password,
 		Host:     config.Host,
@@ -99,8 +98,8 @@ func main() {
 }
 
 // TestDBConnection tests the database connection
-func TestDBConnection(db *sql.DB) error {
-	if err := db.Ping(); err != nil {
+func TestDBConnection(dbConn *common.DBConnection) error {
+	if err := dbConn.DB.Ping(); err != nil {
 		return err
 	}
 	return nil

@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/mayureshucsb2019/bookstore/service/common"
 )
 
 // Author represents the structure of an Author record in the database.
@@ -43,8 +44,8 @@ type AuthorRepository struct {
 }
 
 // NewAuthorRepository creates a new AuthorRepository with a database connection.
-func NewAuthorRepository(db *sql.DB) *AuthorRepository {
-	return &AuthorRepository{DB: db}
+func NewAuthorRepository(dbConn *common.DBConnection) *AuthorRepository {
+	return &AuthorRepository{DB: dbConn.DB}
 }
 
 // CreateAuthor inserts a new Author into the database.
