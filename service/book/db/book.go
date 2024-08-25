@@ -7,7 +7,6 @@ import (
 	"fmt"
 
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/mayureshucsb2019/bookstore/service/common"
 )
 
 // Book struct represents the structure of a book record in the database.
@@ -25,11 +24,6 @@ type Book struct {
 // BookRepository provides access to the book storage.
 type BookRepository struct {
 	DB *sql.DB
-}
-
-// NewBookRepository creates a new BookRepository with a database connection.
-func NewBookRepository(dbConn *common.DBConnection) *BookRepository {
-	return &BookRepository{DB: dbConn.DB}
 }
 
 // CreateBook inserts a new book into the database.

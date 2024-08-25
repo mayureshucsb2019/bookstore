@@ -6,7 +6,6 @@ import (
 	"fmt"
 
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/mayureshucsb2019/bookstore/service/common"
 )
 
 // Author represents the structure of an Author record in the database.
@@ -41,11 +40,6 @@ func (a *Author) Scan(src interface{}) error {
 // AuthorRepository provides access to the Author storage.
 type AuthorRepository struct {
 	DB *sql.DB
-}
-
-// NewAuthorRepository creates a new AuthorRepository with a database connection.
-func NewAuthorRepository(dbConn *common.DBConnection) *AuthorRepository {
-	return &AuthorRepository{DB: dbConn.DB}
 }
 
 // CreateAuthor inserts a new Author into the database.
