@@ -1,8 +1,6 @@
 package models
 
-import (
-	"github.com/mayureshucsb2019/bookstore/service/common"
-)
+import "github.com/mayureshucsb2019/bookstore/service/common"
 
 type Author struct {
 	Id string `json:"id"`
